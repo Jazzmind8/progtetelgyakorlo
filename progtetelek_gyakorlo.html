@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Programozási tételek gyakorló</title>
+<style>
+  [hidden] { display: none !important; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6; background: #f4f7f6; color: #333;
+    max-width: 860px; margin: 0 auto; padding: 20px;
+  }
+  .container { background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+  h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 0; }
+  .intro { font-style: italic; color: #7f8c8d; }
+
+  /* Főmenü */
+  .cat-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 14px; }
+  @media (min-width: 600px) { .cat-grid { grid-template-columns: 1fr 1fr 1fr; } }
+  .cat-card {
+    background: #fafafa; border: 2px solid #bdc3c7; border-radius: 6px; padding: 16px;
+    text-align: left; cursor: pointer; font-size: 1rem; display: flex; flex-direction: column; gap: 4px;
+    transition: all 0.2s ease; font-family: inherit;
+  }
+  .cat-card:hover { border-color: #3498db; background: #eaf4fb; }
+  .cat-card strong { color: #2c3e50; font-size: 1.1em; }
+  .cat-card span { color: #7f8c8d; font-size: 0.9em; }
+  .cat-all { background: #2c3e50; border-color: #2c3e50; }
+  .cat-all strong, .cat-all span { color: #fff; }
+  .cat-all:hover { background: #34495e; border-color: #3498db; }
+
+  /* Felső sáv */
+  .topbar {
+    background: #e8f4f8; padding: 12px 15px; border-radius: 4px; font-weight: bold;
+    display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;
+  }
+  .progress { height: 8px; background: #d6e6ee; border-radius: 4px; overflow: hidden; margin-bottom: 20px; }
+  .progress-bar { height: 100%; background: #3498db; width: 0%; transition: width 0.3s ease; }
+
+  .btn-small {
+    background: #95a5a6; color: #fff; border: none; padding: 8px 14px; border-radius: 4px;
+    cursor: pointer; font-weight: bold; font-family: inherit;
+  }
+  .btn-small:hover { background: #7f8c8d; }
+  .btn-primary {
+    background: #3498db; color: #fff; border: none; padding: 10px 20px; border-radius: 4px;
+    cursor: pointer; font-weight: bold; font-size: 1rem; font-family: inherit;
+  }
+  .btn-primary:hover { background: #2980b9; }
+
+  /* Kérdés */
+  .question-card {
+    background: #fafafa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 20px; margin-bottom: 10px;
+  }
+  .cat-badge {
+    display: inline-block; background: #2c3e50; color: #fff; font-size: 0.85em;
+    padding: 2px 10px; border-radius: 12px; margin-bottom: 10px;
+  }
+  .question-text { font-weight: 600; font-size: 1.1em; margin-bottom: 15px; color: #2c3e50; }
+  .options { display: grid; grid-template-columns: 1fr; gap: 10px; }
+  @media (min-width: 600px) { .options { grid-template-columns: 1fr 1fr; } }
+  .btn-option {
+    background: #fff; border: 2px solid #bdc3c7; border-radius: 4px; padding: 12px; font-size: 1rem;
+    cursor: pointer; text-align: left; transition: all 0.2s ease; font-family: inherit; color: #333;
+  }
+  .btn-option:hover:not([disabled]) { background: #3498db; color: #fff; border-color: #3498db; }
+  .btn-option[disabled] { cursor: default; }
+  .correct { background: #2ecc71 !important; color: #fff !important; border-color: #2ecc71 !important; }
+  .incorrect { background: #e74c3c !important; color: #fff !important; border-color: #e74c3c !important; }
+
+  .feedback { margin-top: 15px; font-weight: bold; padding: 10px; border-radius: 4px; }
+  .feedback.success { color: #27ae60; background: #e8f8f0; }
+  .feedback.error { color: #c0392b; background: #fce4e4; }
+  .explanation {
+    margin-top: 10px; background: #fef9e7; border-left: 5px solid #f1c40f;
+    padding: 12px 15px; border-radius: 0 4px 4px 0;
+  }
+  .explanation p { margin: 6px 0; }
+  .next-row { margin-top: 15px; text-align: right; }
+
+  /* Összegzés */
+  .final-result { background: #2c3e50; color: #fff; padding: 20px; border-radius: 6px; text-align: center; }
+  .final-result h2 { margin-top: 0; }
+  .stat-list { list-style: none; padding: 0; margin: 15px 0; text-align: left; display: inline-block; }
+  .stat-list li { padding: 4px 0; }
+  .final-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 15px; }
+  .final-result .btn-small { background: #7f8c8d; }
+  .final-result .btn-primary { background: #e67e22; }
+  .final-result .btn-primary:hover { background: #d35400; }
+
+  .code-box { margin-top: 12px; }
+  .code-tabs { display: flex; gap: 6px; margin-bottom: 6px; }
+  .code-tabs .tab {
+    background: #dfe6e9; border: none; padding: 6px 12px; border-radius: 4px 4px 0 0;
+    cursor: pointer; font-family: inherit; font-weight: bold; color: #2c3e50;
+  }
+  .code-tabs .tab.active { background: #2c3e50; color: #fff; }
+  pre.code {
+    background: #2c3e50; color: #ecf0f1; padding: 12px; border-radius: 0 4px 4px 4px;
+    overflow-x: auto; margin: 0; font-family: Consolas, 'Courier New', monospace; font-size: 0.95rem;
+    white-space: pre;
+  }
+  .tip-box {
+    margin-top: 30px; background: #fef9e7; border-left: 5px solid #f1c40f; padding: 15px; border-radius: 0 4px 4px 0;
+  }
+  .tip-box ul { margin: 8px 0 0 0; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Programozási tételek gyakorló</h1>
+  <p class="intro">
+    6 tétel, kategóriánként 20 kérdés. Válassz egy tételt, vagy a vegyes módot!
+    Kattintás után azonnal megmutatom a helyes választ és a magyarázatot.
+  </p>
+
+  <div id="topbar" class="topbar" hidden>
+    <span id="run-info"></span>
+    <button class="btn-small" id="menu-btn">Főmenü</button>
+  </div>
+  <div id="progress" class="progress" hidden><div id="progress-bar" class="progress-bar"></div></div>
+
+  <div id="menu"></div>
+  <div id="quiz" hidden></div>
+  <div id="finish" class="final-result" hidden></div>
+
+  <div class="tip-box">
+    <strong>Tipp a felismeréshez:</strong> keresd a kulcsszavakat a feladat szövegében:
+    <ul>
+      <li>„összesen”, „összeg”, „átlag” → <strong>Összegzés</strong></li>
+      <li>„hány”, „darabszám” → <strong>Megszámlálás</strong></li>
+      <li>„legnagyobb”, „legkisebb”, „legdrágább” → <strong>Maximumkiválasztás</strong></li>
+      <li>„van-e”, „igaz-e”, „létezik-e” → <strong>Eldöntés</strong></li>
+      <li>„melyek”, „gyűjtsd ki”, „válaszd ki” → <strong>Kiválogatás</strong></li>
+      <li>„keressük meg”, és tudjuk, hogy biztosan benne van → <strong>Keresés</strong></li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  const DATA = {
+    "Összegzés": [
+      { q: "Egy tömbben tároljuk egy év havi bevételeit. Számítsuk ki az éves bevétel teljes értékét!",
+        o: ["Összegzés", "Megszámlálás", "Maximumkiválasztás", "Eldöntés"], a: 0,
+        m: "Az összes elem értékét össze kell adni: S := S + a[i] ciklussal. Ez az összegzés tétele." },
+      { q: "Egy osztály tanulóinak dolgozatpontszámából határozzuk meg a pontok átlagát!",
+        o: ["Keresés", "Összegzés", "Kiválogatás", "Megszámlálás"], a: 1,
+        m: "Az átlaghoz először az összeget kell kiszámolni, majd elosztani az elemek számával. Ez összegzés, kiegészítve egy osztással." },
+      { q: "Egy webáruház kosarában lévő termékek árai alapján számoljuk ki, mennyit kell fizetnie a vásárlónak!",
+        o: ["Maximumkiválasztás", "Összegzés", "Megszámlálás", "Keresés"], a: 1,
+        m: "A végösszeg az összes tétel árának összeadásával adódik." },
+      { q: "Adjuk meg egy számsorozat páros elemeinek összegét!",
+        o: ["Kiválogatás", "Összegzés", "Eldöntés", "Megszámlálás"], a: 1,
+        m: "Csak összeadjuk a páros elemeket, nem gyűjtjük ki őket új sorozatba. Ez feltételes összegzés. Ha az elemeket kigyűjtenénk, az kiválogatás lenne." },
+      { q: "Egy fájlban számok találhatók. Adjuk meg a fájlban szereplő összes szám összegét!",
+        o: ["Megszámlálás", "Összegzés", "Keresés", "Eldöntés"], a: 1,
+        m: "Az értékeket kell összeadni, nem a darabszámot kell meghatározni." },
+      { q: "Egy futóversenyen ismerjük a versenyző minden körének idejét. Számítsuk ki a teljes futási időt!",
+        o: ["Összegzés", "Maximumkiválasztás", "Eldöntés", "Keresés"], a: 0,
+        m: "A teljes idő a körök idejének összege." },
+      { q: "Egy hónap napi áramfogyasztásából számoljuk ki a havi összfogyasztást!",
+        o: ["Összegzés", "Kiválogatás", "Megszámlálás", "Keresés"], a: 0,
+        m: "A napi értékek összeadásával kapjuk meg a havi összfogyasztást." },
+      { q: "Egy ciklusban az S változóhoz minden lépésben hozzáadjuk a sorozat aktuális elemét, S kezdőértéke 0. Melyik tételről van szó?",
+        o: ["Megszámlálás", "Összegzés", "Eldöntés", "Maximumkiválasztás"], a: 1,
+        m: "Az S := S + a[i] minta az összegzés tipikus felépítése." },
+      { q: "Egy üzletben ismerjük a napi bevételeket. Adjuk meg a hét teljes bevételét!",
+        o: ["Összegzés", "Kiválogatás", "Keresés", "Megszámlálás"], a: 0,
+        m: "A hét teljes bevétele a napi bevételek összege." },
+      { q: "Egy számsorozat elemeinek négyzeteit összeadjuk: a1² + a2² + … + an². Melyik tétel?",
+        o: ["Eldöntés", "Összegzés", "Keresés", "Kiválogatás"], a: 1,
+        m: "Az elemekből származó értékeket (itt a négyzeteket) összegezzük, ez összegzés." },
+      { q: "Egy osztály jegyeit összeadjuk, majd elosztjuk a jegyek számával. Mit számítunk ki?",
+        o: ["Maximumkiválasztás", "Összegzés", "Megszámlálás", "Eldöntés"], a: 1,
+        m: "Ez az átlag kiszámítása: összegzés és osztás." },
+      { q: "Egy raktár minden polcán ismerjük a termékek darabszámát. Adjuk meg a raktárban lévő összes termék darabszámát!",
+        o: ["Összegzés", "Megszámlálás", "Keresés", "Eldöntés"], a: 0,
+        m: "A polcok darabszámait összeadjuk. A Megszámlálás akkor lenne helyes, ha egy feltétel szerint egyenként számolnánk az eseményeket." },
+      { q: "Egy vállalat dolgozóinak havi bérét ismerjük. Adjuk meg a havi bérköltséget!",
+        o: ["Összegzés", "Maximumkiválasztás", "Kiválogatás", "Keresés"], a: 0,
+        m: "A teljes bérköltség az összes bér összege." },
+      { q: "Egy tömb pozitív elemeit adjuk össze, de az elemeket nem kell kigyűjteni.",
+        o: ["Kiválogatás", "Megszámlálás", "Összegzés", "Eldöntés"], a: 2,
+        m: "Csak összeadjuk a feltételnek megfelelő elemeket. Ha új tömbbe mentenénk őket, az kiválogatás lenne." },
+      { q: "Egy szöveges fájlban tízes számrendszerű számok találhatók. Beolvasás közben összegezzük őket. Melyik tétel?",
+        o: ["Keresés", "Összegzés", "Megszámlálás", "Maximumkiválasztás"], a: 1,
+        m: "A beolvasott számok értékét folyamatosan összeadjuk." },
+      { q: "Egy eseményre a hét 7 napján ismerjük a vendégek számát. Mennyi az egy napra jutó átlagos vendégszám?",
+        o: ["Összegzés", "Megszámlálás", "Eldöntés", "Keresés"], a: 0,
+        m: "Először összeadjuk a hét napjainak vendégszámait, majd elosztjuk 7-tel. Az átlag az összegzés tételéből adódik." },
+      { q: "Egy számsorozatban csak a páratlan elemeket adjuk össze, a többit figyelmen kívül hagyjuk.",
+        o: ["Összegzés", "Kiválogatás", "Megszámlálás", "Eldöntés"], a: 0,
+        m: "Feltételes összegzés: a páratlan elemek értékét adjuk össze. Nem számoljuk meg őket és nem gyűjtjük ki." },
+      { q: "Egy utazás teljes megtett távolságát a szakaszok hosszának összeadásával kapjuk meg.",
+        o: ["Megszámlálás", "Maximumkiválasztás", "Összegzés", "Keresés"], a: 2,
+        m: "A szakaszok hosszának összege adja a teljes távolságot." },
+      { q: "Egy számsorozat minden tagját megszorozzuk 2-vel, majd az eredményeket összeadjuk.",
+        o: ["Összegzés", "Eldöntés", "Keresés", "Megszámlálás"], a: 0,
+        m: "Az elemekből számolt értékek összeadása az összegzés tétele." },
+      { q: "Adjuk meg egy osztály tanulói magasságainak összegét centiméterben!",
+        o: ["Összegzés", "Maximumkiválasztás", "Megszámlálás", "Keresés"], a: 0,
+        m: "Minden tanuló magasságát össze kell adni." }
+    ],
+
+    "Megszámlálás": [
+      { q: "Egy szövegben hány darab szóköz karakter található?",
+        o: ["Összegzés", "Megszámlálás", "Keresés", "Eldöntés"], a: 1,
+        m: "Darabszámot kérdezünk egy feltételre (szóköz karakter). Ezt számlálóval oldjuk meg." },
+      { q: "Hány darab 3-as osztályzat szerepel a naplóban?",
+        o: ["Kiválogatás", "Megszámlálás", "Maximumkiválasztás", "Összegzés"], a: 1,
+        m: "A darabszám a feladat, ezért számlálunk. Ha az érdemjegyeket listába kellene gyűjteni, az kiválogatás lenne." },
+      { q: "Hány páros szám van egy tömbben?",
+        o: ["Megszámlálás", "Összegzés", "Eldöntés", "Kiválogatás"], a: 0,
+        m: "Minden elemet megvizsgálunk, és ha páros, a számláló értékét eggyel növeljük." },
+      { q: "Hány magánhangzó található egy szóban?",
+        o: ["Keresés", "Eldöntés", "Megszámlálás", "Összegzés"], a: 2,
+        m: "A magánhangzók darabszámát kell meghatározni, ez megszámlálás." },
+      { q: "Hány negatív hőmérsékleti adat van a mérési sorozatban?",
+        o: ["Megszámlálás", "Kiválogatás", "Eldöntés", "Maximumkiválasztás"], a: 0,
+        m: "Darabszámot keresünk a negatív értékekre, a számláló minden találatnál nő." },
+      { q: "Hány olyan termék van a raktárban, amelynek készlete 0?",
+        o: ["Kiválogatás", "Megszámlálás", "Keresés", "Összegzés"], a: 1,
+        m: "Csak a termékek darabszámát kérdezzük, nem a termékeket magukat." },
+      { q: "Hány szökőév van a megadott évszámok között?",
+        o: ["Összegzés", "Eldöntés", "Megszámlálás", "Keresés"], a: 2,
+        m: "A feltételnek megfelelő évek darabszáma a kérdés, ezért megszámlálás." },
+      { q: "Hányszor szerepel a 'kutya' szó a dokumentumban?",
+        o: ["Megszámlálás", "Keresés", "Eldöntés", "Összegzés"], a: 0,
+        m: "Az előfordulások száma a kérdés, minden találatnál a számlálót növeljük." },
+      { q: "Hány ötjegyű szám szerepel az állományban?",
+        o: ["Kiválogatás", "Eldöntés", "Megszámlálás", "Maximumkiválasztás"], a: 2,
+        m: "A feltételnek (ötjegyű) megfelelő elemek darabszámát keressük." },
+      { q: "Hány diák nem teljesítette a vizsgát?",
+        o: ["Megszámlálás", "Keresés", "Összegzés", "Kiválogatás"], a: 0,
+        m: "A nem teljesítők darabszáma a kérdés, ezért számlálunk." },
+      { q: "Hány kétjegyű szám van a tömbben?",
+        o: ["Eldöntés", "Megszámlálás", "Összegzés", "Kiválogatás"], a: 1,
+        m: "Számlálóval végigmegyünk a tömbön, és a kétjegyű számoknál növeljük a számlálót." },
+      { q: "Hány olyan hallgató van, aki legalább három tárgyból ötöst kapott?",
+        o: ["Megszámlálás", "Eldöntés", "Kiválogatás", "Keresés"], a: 0,
+        m: "Feltételes számlálás: minden hallgatónál megvizsgáljuk a feltételt, és a megfelelőknél a számlálót növeljük." },
+      { q: "Hány darab kettővel osztható szám van a listában?",
+        o: ["Összegzés", "Megszámlálás", "Maximumkiválasztás", "Eldöntés"], a: 1,
+        m: "A kettővel osztható elemek darabszámát kell megadni, ez számlálás." },
+      { q: "Egy ciklusban minden olyan elemnél, amely megfelel a feltételnek, az N változót eggyel növeljük. Melyik tétel ez?",
+        o: ["Összegzés", "Eldöntés", "Megszámlálás", "Keresés"], a: 2,
+        m: "Az N := N + 1 minta a megszámlálás tipikus felépítése." },
+      { q: "Hány 10-nél nagyobb elem van a tömbben?",
+        o: ["Kiválogatás", "Megszámlálás", "Keresés", "Eldöntés"], a: 1,
+        m: "Nem az elemeket kell kigyűjteni, csak a darabszámukat kérdezzük." },
+      { q: "Egy kísérletben 60 kockadobást végeztünk. Hány alkalommal dobtunk hatost?",
+        o: ["Megszámlálás", "Maximumkiválasztás", "Keresés", "Összegzés"], a: 0,
+        m: "A hatosok darabszámát keressük, ezért megszámlálás." },
+      { q: "Hány üres sor található egy fájlban?",
+        o: ["Eldöntés", "Megszámlálás", "Kiválogatás", "Keresés"], a: 1,
+        m: "A feltételnek (üres sor) megfelelő sorok darabszámát kell meghatározni." },
+      { q: "Egy sportolónak 12 edzésnapja volt. Hány edzésen futott 10 km-nél többet?",
+        o: ["Kiválogatás", "Összegzés", "Megszámlálás", "Eldöntés"], a: 2,
+        m: "Darabszámot kérdezünk egy feltételre, nem az összes távolságot és nem a napokat." },
+      { q: "Egy szövegben hányszor fordul elő az 'a' betű?",
+        o: ["Megszámlálás", "Eldöntés", "Keresés", "Összegzés"], a: 0,
+        m: "Az előfordulások darabszámát kell megadni, ezért számlálunk." },
+      { q: "Egy szöveges állományban hány olyan sor van, amely 80 karakternél hosszabb?",
+        o: ["Kiválogatás", "Megszámlálás", "Eldöntés", "Maximumkiválasztás"], a: 1,
+        m: "A feltételnek megfelelő sorok darabszámát kérdezzük, ezért megszámlálás." }
+    ],
+
+    "Maximumkiválasztás": [
+      { q: "Keressük meg egy számsorozatban a legkisebb értéket!",
+        o: ["Keresés", "Kiválogatás", "Maximumkiválasztás", "Összegzés"], a: 2,
+        m: "A minimum (legkisebb érték) is szélsőérték-kiválasztás, ez a maximumkiválasztás tétele." },
+      { q: "Melyik a legmagasabb hegy magassága a listából?",
+        o: ["Keresés", "Maximumkiválasztás", "Összegzés", "Eldöntés"], a: 1,
+        m: "A legnagyobb érték kiválasztása, ez maximumkiválasztás." },
+      { q: "Melyik tanuló szerezte a legtöbb pontot a versenyen?",
+        o: ["Maximumkiválasztás", "Megszámlálás", "Kiválogatás", "Eldöntés"], a: 0,
+        m: "A legnagyobb pontszámot keressük, ez szélsőérték-kiválasztás." },
+      { q: "Határozzuk meg a legdrágább termék árát a listából!",
+        o: ["Összegzés", "Maximumkiválasztás", "Keresés", "Kiválogatás"], a: 1,
+        m: "A 'legdrágább' kulcsszó a legnagyobb érték kiválasztására utal." },
+      { q: "Mi a leghosszabb szó egy szövegben?",
+        o: ["Kiválogatás", "Eldöntés", "Keresés", "Maximumkiválasztás"], a: 3,
+        m: "A leghosszabb elem a hosszúság szerinti maximum." },
+      { q: "Keressük meg a legnagyobb hőmérsékletet a hét mérései közül!",
+        o: ["Megszámlálás", "Maximumkiválasztás", "Összegzés", "Eldöntés"], a: 1,
+        m: "A legnagyobb érték kiválasztása a feladat, ez maximumkiválasztás." },
+      { q: "Melyik versenyző a legfiatalabb a csapatban?",
+        o: ["Keresés", "Maximumkiválasztás", "Eldöntés", "Kiválogatás"], a: 1,
+        m: "A legfiatalabb a legkisebb életkor kiválasztása, ez szélsőérték-kiválasztás." },
+      { q: "Mi a tömb elemeinek legnagyobb értéke?",
+        o: ["Összegzés", "Maximumkiválasztás", "Megszámlálás", "Keresés"], a: 1,
+        m: "A legnagyobb érték közvetlen kiválasztása." },
+      { q: "Állapítsuk meg, melyik vásárló költötte a legtöbbet a hónapban!",
+        o: ["Kiválogatás", "Megszámlálás", "Maximumkiválasztás", "Összegzés"], a: 2,
+        m: "A legnagyobb költés kiválasztása, ez maximumkiválasztás." },
+      { q: "Egy rendezetlen sorozatban keressük meg a legkisebb elem indexét!",
+        o: ["Keresés", "Maximumkiválasztás", "Eldöntés", "Összegzés"], a: 1,
+        m: "A minimum kiválasztása és annak helyének megadása szélsőérték-kiválasztás. Nem azt keressük, hogy egy adott érték előfordul-e." },
+      { q: "Melyik város van a legtávolabb a listában szereplő városok közül?",
+        o: ["Eldöntés", "Keresés", "Maximumkiválasztás", "Megszámlálás"], a: 2,
+        m: "A legnagyobb távolság kiválasztása, ez maximumkiválasztás." },
+      { q: "Melyik hónapban volt a legnagyobb bevétel?",
+        o: ["Kiválogatás", "Maximumkiválasztás", "Összegzés", "Eldöntés"], a: 1,
+        m: "A legnagyobb értékű hónap kiválasztása szélsőérték-kiválasztás." },
+      { q: "Egy osztály legmagasabb tanulójának nevét adjuk meg.",
+        o: ["Keresés", "Kiválogatás", "Maximumkiválasztás", "Megszámlálás"], a: 2,
+        m: "A legmagasabb érték (magasság) alapján választjuk ki az elemet." },
+      { q: "Melyik versenyző futotta a legrövidebb időt?",
+        o: ["Maximumkiválasztás", "Összegzés", "Eldöntés", "Keresés"], a: 0,
+        m: "A legkisebb időt keressük, ez szélsőérték-kiválasztás (minimum)." },
+      { q: "Egy táblázat egy oszlopában keressük a legnagyobb értéket.",
+        o: ["Maximumkiválasztás", "Megszámlálás", "Összegzés", "Kiválogatás"], a: 0,
+        m: "Az oszlop legnagyobb értékének kiválasztása maximumkiválasztás." },
+      { q: "Melyik a legolcsóbb menüajánlat a listában?",
+        o: ["Keresés", "Eldöntés", "Összegzés", "Maximumkiválasztás"], a: 3,
+        m: "A legkisebb ár kiválasztása szélsőérték-kiválasztás." },
+      { q: "Adjuk meg a sorozat legnagyobb elemét és annak sorszámát!",
+        o: ["Összegzés", "Keresés", "Maximumkiválasztás", "Megszámlálás"], a: 2,
+        m: "A legnagyobb elem és a helye is a szélsőérték-kiválasztás része." },
+      { q: "Mennyi volt a legnagyobb napi csapadékmennyiség a hónapban?",
+        o: ["Megszámlálás", "Maximumkiválasztás", "Eldöntés", "Kiválogatás"], a: 1,
+        m: "A legnagyobb napi érték kiválasztása, ez maximumkiválasztás." },
+      { q: "Ki kölcsönözte a legtöbb könyvet a könyvtárban?",
+        o: ["Kiválogatás", "Maximumkiválasztás", "Összegzés", "Keresés"], a: 1,
+        m: "A legnagyobb kölcsönzésszámú olvasó kiválasztása szélsőérték-kiválasztás." },
+      { q: "Egy hőmérséklet-adatsorban megkeressük a legkisebb értéket, és visszaadjuk azt.",
+        o: ["Maximumkiválasztás", "Eldöntés", "Megszámlálás", "Kiválogatás"], a: 0,
+        m: "A minimum kiválasztása is maximumkiválasztás, a minimumkeresés ennek változata." }
+    ],
+
+    "Eldöntés": [
+      { q: "Van-e a listában 1000-nél nagyobb szám?",
+        o: ["Megszámlálás", "Keresés", "Eldöntés", "Kiválogatás"], a: 2,
+        m: "A válasz csak igen vagy nem lehet. Ezt a logikai kérdést eldöntésnek hívjuk." },
+      { q: "Igaz-e, hogy a tömb minden eleme pozitív?",
+        o: ["Eldöntés", "Összegzés", "Maximumkiválasztás", "Megszámlálás"], a: 0,
+        m: "A kérdésre igen vagy nem a válasz, és az összes elemre vonatkozik. Ez eldöntés." },
+      { q: "Tartalmaz-e a jelszó legalább egy nagybetűt?",
+        o: ["Kiválogatás", "Megszámlálás", "Eldöntés", "Összegzés"], a: 2,
+        m: "A válasz logikai érték (igaz/hamis). Elég egyetlen olyan karaktert találni, amely teljesíti a feltételt." },
+      { q: "Létezik-e a webáruházban olyan termék, amelynek ára 0 Ft?",
+        o: ["Eldöntés", "Keresés", "Összegzés", "Megszámlálás"], a: 0,
+        m: "Csak azt kell eldönteni, hogy van-e ilyen elem (igen/nem)." },
+      { q: "Van-e a tömbben két egyenlő elem?",
+        o: ["Megszámlálás", "Eldöntés", "Maximumkiválasztás", "Összegzés"], a: 1,
+        m: "A kérdés igen/nem választ vár: létezik-e ilyen pár." },
+      { q: "Szerepel-e a névlistában a 'Budapest' szó?",
+        o: ["Keresés", "Eldöntés", "Kiválogatás", "Összegzés"], a: 1,
+        m: "A válasz csak igen vagy nem lehet, nem kell az elem helyét megadni." },
+      { q: "Van-e a számok között négyzetszám?",
+        o: ["Megszámlálás", "Eldöntés", "Összegzés", "Kiválogatás"], a: 1,
+        m: "Igen/nem kérdés: létezik-e legalább egy négyzetszám." },
+      { q: "Történt-e legalább egy késés a menetrendben?",
+        o: ["Eldöntés", "Megszámlálás", "Keresés", "Összegzés"], a: 0,
+        m: "Elég egyetlen késést találni az igen válaszhoz. Ez eldöntés." },
+      { q: "Volt-e a héten olyan nap, amikor a hőmérséklet 30 fok felett volt?",
+        o: ["Maximumkiválasztás", "Eldöntés", "Kiválogatás", "Összegzés"], a: 1,
+        m: "Igen/nem kérdés, a napok közül legalább egy teljesítse a feltételt." },
+      { q: "Előfordul-e az 'x' betű a szóban?",
+        o: ["Keresés", "Megszámlálás", "Eldöntés", "Összegzés"], a: 2,
+        m: "A kérdés csak arra irányul, hogy van-e ilyen karakter (igen/nem)." },
+      { q: "Csak páros számokból áll-e a tömb?",
+        o: ["Eldöntés", "Kiválogatás", "Összegzés", "Megszámlálás"], a: 0,
+        m: "Az összes elemre vonatkozó igen/nem kérdés. Ez eldöntés." },
+      { q: "Van-e olyan tanuló az osztályban, aki elégtelent kapott?",
+        o: ["Megszámlálás", "Kiválogatás", "Eldöntés", "Keresés"], a: 2,
+        m: "Igen/nem: létezik-e legalább egy olyan tanuló." },
+      { q: "Rendezett-e növekvő sorrendben a sorozat?",
+        o: ["Eldöntés", "Maximumkiválasztás", "Összegzés", "Keresés"], a: 0,
+        m: "Igen/nem: a sorozat minden szomszédos párjára ellenőrizzük a rendezettséget. Ez eldöntés." },
+      { q: "Van-e hiányzó adat (üres mező) a táblázatban?",
+        o: ["Keresés", "Eldöntés", "Megszámlálás", "Kiválogatás"], a: 1,
+        m: "A kérdés igen/nem választ vár, nem a darabszámot vagy a helyet." },
+      { q: "Teljesül-e minden utasra, hogy 18 évnél idősebb?",
+        o: ["Maximumkiválasztás", "Kiválogatás", "Összegzés", "Eldöntés"], a: 3,
+        m: "Az összes elemre vonatkozó igen/nem kérdés. Ez eldöntés." },
+      { q: "Létezik-e a tömbben a 0 érték?",
+        o: ["Eldöntés", "Megszámlálás", "Összegzés", "Keresés"], a: 0,
+        m: "Igen/nem: van-e legalább egy nulla elem." },
+      { q: "Megegyezik-e két lista tartalma?",
+        o: ["Kiválogatás", "Eldöntés", "Megszámlálás", "Összegzés"], a: 1,
+        m: "A válasz igen vagy nem. Ez eldöntés." },
+      { q: "Szerepel-e az e-mail-címben '@' karakter?",
+        o: ["Eldöntés", "Keresés", "Megszámlálás", "Kiválogatás"], a: 0,
+        m: "Igen/nem: van-e legalább egy '@' karakter. Nem kell a helyét megadni." },
+      { q: "Van-e a sorozatban olyan szám, amely 7-tel osztható?",
+        o: ["Megszámlálás", "Keresés", "Összegzés", "Eldöntés"], a: 3,
+        m: "Igen/nem kérdés: létezik-e legalább egy ilyen elem." },
+      { q: "Egy számsorozatban van-e legalább egy páratlan elem?",
+        o: ["Eldöntés", "Maximumkiválasztás", "Kiválogatás", "Összegzés"], a: 0,
+        m: "Igen/nem: létezik-e legalább egy páratlan szám." }
+    ],
+
+    "Kiválogatás": [
+      { q: "Gyűjtsük ki a 18 év alatti tanulók nevét egy külön listába!",
+        o: ["Kiválogatás", "Keresés", "Megszámlálás", "Eldöntés"], a: 0,
+        m: "A feltételnek megfelelő elemeket új listába másoljuk, ez kiválogatás." },
+      { q: "Válasszuk ki a 3-mal osztható számokat, és tegyük őket új tömbbe!",
+        o: ["Megszámlálás", "Összegzés", "Kiválogatás", "Eldöntés"], a: 2,
+        m: "Az elemek kiemelése új tömbbe a kiválogatás tétele." },
+      { q: "Gyűjtsük ki az 'A' betűvel kezdődő városokat!",
+        o: ["Eldöntés", "Kiválogatás", "Összegzés", "Keresés"], a: 1,
+        m: "A feltételnek megfelelő elemeket kigyűjtjük, ez kiválogatás." },
+      { q: "Másoljuk át egy új fájlba a 2000 Ft feletti tételeket!",
+        o: ["Kiválogatás", "Megszámlálás", "Keresés", "Maximumkiválasztás"], a: 0,
+        m: "A feltételt teljesítő elemeket külön tárolóba másoljuk, ez kiválogatás." },
+      { q: "Készítsünk listát azokról a diákokról, akik megfeleltek!",
+        o: ["Kiválogatás", "Eldöntés", "Megszámlálás", "Összegzés"], a: 0,
+        m: "A megfelelt diákok listáját a feltétel alapján állítjuk össze, ez kiválogatás." },
+      { q: "Az elutasított pályázatok közül mentsük el külön a hiányosakat!",
+        o: ["Keresés", "Kiválogatás", "Eldöntés", "Összegzés"], a: 1,
+        m: "A feltételnek (hiányos) megfelelő elemeket külön tároljuk." },
+      { q: "Melyek azok a hónapok, amelyekben nőtt az eladás?",
+        o: ["Kiválogatás", "Megszámlálás", "Maximumkiválasztás", "Összegzés"], a: 0,
+        m: "A 'melyek' szó azt jelzi, hogy az elemeket kell megadni, nem a darabszámot. Ez kiválogatás." },
+      { q: "Egy rendelési listából gyűjtsük ki a készleten lévő termékeket!",
+        o: ["Eldöntés", "Megszámlálás", "Kiválogatás", "Összegzés"], a: 2,
+        m: "A készleten lévő termékeket kigyűjtjük a feltétel alapján." },
+      { q: "Válasszuk ki a negatív hőmérsékleti adatokat egy külön tömbbe!",
+        o: ["Kiválogatás", "Maximumkiválasztás", "Összegzés", "Keresés"], a: 0,
+        m: "A negatív adatokat egy külön tömbbe másoljuk ki, ez kiválogatás." },
+      { q: "Sorold fel új listába azokat a versenyzőket, akik 10 km-nél többet futottak!",
+        o: ["Megszámlálás", "Kiválogatás", "Keresés", "Eldöntés"], a: 1,
+        m: "A 'sorold fel' és az új listába írás a kiválogatás jellemzője." },
+      { q: "Szűrjük ki egy szövegből a magánhangzókat, és mentsük őket külön sorozatba!",
+        o: ["Összegzés", "Eldöntés", "Megszámlálás", "Kiválogatás"], a: 3,
+        m: "A magánhangzókat kigyűjtjük egy új sorozatba, ez kiválogatás." },
+      { q: "Válasszuk ki a 100-nál kisebb számokat egy új sorozatba!",
+        o: ["Kiválogatás", "Megszámlálás", "Keresés", "Összegzés"], a: 0,
+        m: "A feltételnek megfelelő elemeket új sorozatba másoljuk." },
+      { q: "Készítsünk listát a lejárt szavatosságú termékekről!",
+        o: ["Eldöntés", "Kiválogatás", "Összegzés", "Keresés"], a: 1,
+        m: "A lejárt termékek listáját a feltétel alapján állítjuk össze." },
+      { q: "Gyűjtsük össze a könyvtári hátralékos kölcsönzéseket egy listába!",
+        o: ["Megszámlálás", "Eldöntés", "Kiválogatás", "Maximumkiválasztás"], a: 2,
+        m: "A hátralékos kölcsönzéseket egy listába gyűjtjük, ez kiválogatás." },
+      { q: "Válasszuk ki az 5 karakternél hosszabb szavakat!",
+        o: ["Kiválogatás", "Megszámlálás", "Keresés", "Eldöntés"], a: 0,
+        m: "A feltételnek megfelelő szavakat kigyűjtjük, ez kiválogatás." },
+      { q: "Mentsük el a kedvezményes tételeket egy kedvezménylistába!",
+        o: ["Összegzés", "Keresés", "Kiválogatás", "Eldöntés"], a: 2,
+        m: "A kedvezményes tételeket külön listába mentjük, ez kiválogatás." },
+      { q: "Készítsünk listát az 1990 utáni évjáratú autókról!",
+        o: ["Kiválogatás", "Megszámlálás", "Maximumkiválasztás", "Összegzés"], a: 0,
+        m: "A feltételnek megfelelő autók listáját állítjuk össze." },
+      { q: "Egy szövegből gyűjtsük ki a nagybetűvel kezdődő szavakat!",
+        o: ["Megszámlálás", "Keresés", "Kiválogatás", "Eldöntés"], a: 2,
+        m: "A feltételnek megfelelő szavakat kigyűjtjük. Ha csak a darabszámot kérdeznék, az megszámlálás lenne." },
+      { q: "Egy mérési sorozatból szűrjük ki a hibásnak jelölt adatokat, és tegyük őket új adatsorba!",
+        o: ["Kiválogatás", "Összegzés", "Eldöntés", "Keresés"], a: 0,
+        m: "A feltételnek megfelelő adatokat új adatsorba másoljuk, ez kiválogatás." },
+      { q: "Szűrjük ki a 0-nál kisebb értékű adatokat!",
+        o: ["Megszámlálás", "Kiválogatás", "Eldöntés", "Maximumkiválasztás"], a: 1,
+        m: "A szűrés a feltételnek megfelelő elemek kigyűjtését jelenti, ez kiválogatás." }
+    ],
+
+    "Keresés": [
+      { q: "Tudjuk, hogy a futóverseny résztvevői között van legalább egy budapesti versenyző. Adjunk meg egy budapesti versenyzőt!",
+        o: ["Eldöntés", "Kiválogatás", "Keresés", "Megszámlálás"], a: 2,
+        m: "Mivel biztosan van ilyen elem, elég az első ilyen elemet megkeresni. Ez keresés." },
+      { q: "Tudjuk, hogy a tömbben van 100-nál nagyobb szám. Keressük meg az első ilyen elem indexét!",
+        o: ["Keresés", "Maximumkiválasztás", "Eldöntés", "Kiválogatás"], a: 0,
+        m: "A biztosan létező elem első előfordulását keressük. Ez keresés." },
+      { q: "Hol található a 42-es szám a tömbben? Biztosak vagyunk benne, hogy szerepel.",
+        o: ["Eldöntés", "Megszámlálás", "Keresés", "Összegzés"], a: 2,
+        m: "A 'hol található' kérdés és a biztos előfordulás együtt keresésre utal." },
+      { q: "Keressük meg a 'Fehér' vezetéknevű vevő adatait a listában, tudva, hogy szerepel.",
+        o: ["Kiválogatás", "Keresés", "Eldöntés", "Összegzés"], a: 1,
+        m: "Mivel tudjuk, hogy az elem szerepel, az első találatot keressük meg. Ez keresés." },
+      { q: "Adjuk meg az első negatív szám indexét! Tudjuk, hogy van negatív elem.",
+        o: ["Maximumkiválasztás", "Keresés", "Megszámlálás", "Eldöntés"], a: 1,
+        m: "Az első előfordulás helyének megadása, ha biztosan van ilyen elem, keresés." },
+      { q: "Egy könyvtári katalógusban keressük meg a 'Háború és béke' példányának helyét. A könyvtárban biztosan van példány.",
+        o: ["Keresés", "Megszámlálás", "Összegzés", "Eldöntés"], a: 0,
+        m: "A biztosan létező elem megkeresése és a helye megadása keresés." },
+      { q: "Egy telefonkönyvben keressük meg Szabó Péter telefonszámát. Biztosan szerepel a listában.",
+        o: ["Keresés", "Eldöntés", "Kiválogatás", "Összegzés"], a: 0,
+        m: "Az ismert (biztosan szereplő) elem adatainak megkeresése keresés." },
+      { q: "Egy sorozatban keressük meg az első olyan elemet, amely kisebb az x értéknél. Tudjuk, hogy van ilyen.",
+        o: ["Keresés", "Maximumkiválasztás", "Összegzés", "Megszámlálás"], a: 0,
+        m: "Az első olyan elem megkeresése, amely teljesíti a feltételt, és biztosan létezik. Ez keresés." },
+      { q: "Egy szóban keressük meg az első 'a' betű helyét. Tudjuk, hogy van benne.",
+        o: ["Keresés", "Kiválogatás", "Eldöntés", "Összegzés"], a: 0,
+        m: "Az első előfordulás helyét keressük, mivel biztosan van ilyen karakter." },
+      { q: "Egy táblázatban keressük meg a 'Kiss Anna' nevű sort. Biztosan szerepel.",
+        o: ["Megszámlálás", "Keresés", "Kiválogatás", "Összegzés"], a: 1,
+        m: "A biztosan szereplő sor megkeresése keresés." },
+      { q: "Egy adatbázisban keressük meg az 1042-es vevőazonosítóhoz tartozó rekordot. Biztosan létezik.",
+        o: ["Keresés", "Eldöntés", "Összegzés", "Kiválogatás"], a: 0,
+        m: "Az ismert, létező rekord megkeresése keresés." },
+      { q: "Egy versenyző rajtszámát keressük meg a listában. Biztosan szerepel.",
+        o: ["Eldöntés", "Maximumkiválasztás", "Keresés", "Megszámlálás"], a: 2,
+        m: "Mivel biztosan szerepel, megkeressük az elemet. Ez keresés, nem eldöntés, mert nem igen/nem a válasz." },
+      { q: "Adjuk meg a tömb első hibás elemének indexét! Tudjuk, hogy van hibás elem.",
+        o: ["Keresés", "Összegzés", "Kiválogatás", "Megszámlálás"], a: 0,
+        m: "Az első hibás elem helyét keressük, és tudjuk, hogy létezik. Ez keresés." },
+      { q: "Melyik sorban található a 'Piros' szín a táblázatban? Tudjuk, hogy szerepel.",
+        o: ["Eldöntés", "Kiválogatás", "Keresés", "Összegzés"], a: 2,
+        m: "A helyet kérdezzük, és biztosan van ilyen elem. Ez keresés." },
+      { q: "Egy névjegyzékben keressük meg az első olyan személyt, aki Debrecenben lakik. Tudjuk, hogy van ilyen.",
+        o: ["Kiválogatás", "Keresés", "Eldöntés", "Megszámlálás"], a: 1,
+        m: "Az első olyan elemet keressük, amely teljesíti a feltételt, és biztosan létezik. Ez keresés." },
+      { q: "Egy zenei listában keressük meg az első olyan dalt, amely 5 percnél hosszabb. Biztosan van ilyen.",
+        o: ["Maximumkiválasztás", "Megszámlálás", "Keresés", "Összegzés"], a: 2,
+        m: "Az első elem megkeresése, amelyről tudjuk, hogy létezik. Ez keresés." },
+      { q: "Keressük meg azt a diákot, akinek a dolgozata 90 pont felett van. Biztosan van ilyen.",
+        o: ["Eldöntés", "Keresés", "Kiválogatás", "Összegzés"], a: 1,
+        m: "Biztosan létező elem keresése, ez keresés. Eldöntés lenne, ha azt kérdeznénk, van-e ilyen diák." },
+      { q: "Egy nyilvántartásban keressük meg a 'K-1234' azonosítójú járművet. Tudjuk, hogy szerepel.",
+        o: ["Keresés", "Megszámlálás", "Eldöntés", "Kiválogatás"], a: 0,
+        m: "A biztosan szereplő elem megkeresése keresés." },
+      { q: "Egy karakterláncban keressük meg a '@' jel pozícióját. Tudjuk, hogy van benne.",
+        o: ["Összegzés", "Keresés", "Kiválogatás", "Eldöntés"], a: 1,
+        m: "A pozíció megadása biztosan létező elemnél keresés." },
+      { q: "Egy könyvtári polcon egy adott könyv helyét keressük meg. Tudjuk, hogy a polcon van.",
+        o: ["Megszámlálás", "Keresés", "Eldöntés", "Összegzés"], a: 1,
+        m: "A biztosan létező elem helyét keressük, ez keresés." }
+    ]
+  };
+
+  // ----- Kódminták tételenként (pszeudó, Python, C#) -----
+  const CODE = {
+    "Összegzés": {
+      psz: `S := 0
+CIKLUS i := 1-től n-ig
+    S := S + a[i]
+CIKLUS VÉGE`,
+      py: `s = 0
+for x in a:
+    s += x`,
+      cs: `int s = 0;
+foreach (int x in a)
+    s += x;`
+    },
+    "Megszámlálás": {
+      psz: `N := 0
+CIKLUS i := 1-től n-ig
+    HA feltétel(a[i]) AKKOR N := N + 1
+CIKLUS VÉGE`,
+      py: `n = 0
+for x in a:
+    if x % 2 == 0:   # a feladat feltétele
+        n += 1`,
+      cs: `int n = 0;
+foreach (int x in a)
+    if (x % 2 == 0) n++;   // a feladat feltétele`
+    },
+    "Maximumkiválasztás": {
+      psz: `max := a[1]
+CIKLUS i := 2-től n-ig
+    HA a[i] > max AKKOR max := a[i]
+CIKLUS VÉGE`,
+      py: `m = a[0]
+for x in a[1:]:
+    if x > m:
+        m = x`,
+      cs: `int m = a[0];
+for (int i = 1; i < a.Length; i++)
+    if (a[i] > m) m = a[i];`
+    },
+    "Eldöntés": {
+      psz: `van := HAMIS
+i := 1
+MÍG i <= n ÉS NEM van
+    HA feltétel(a[i]) AKKOR van := IGAZ
+    i := i + 1
+CIKLUS VÉGE`,
+      py: `van = False
+for x in a:
+    if x > 1000:     # a feladat feltétele
+        van = True
+        break`,
+      cs: `bool van = false;
+foreach (int x in a)
+    if (x > 1000) { van = true; break; }   // a feladat feltétele`
+    },
+    "Kiválogatás": {
+      psz: `db := 0
+CIKLUS i := 1-től n-ig
+    HA feltétel(a[i]) AKKOR
+        db := db + 1
+        b[db] := a[i]
+CIKLUS VÉGE`,
+      py: `b = [x for x in a if x > 0]   # rövid forma
+# vagy ciklussal:
+b = []
+for x in a:
+    if x > 0:
+        b.append(x)`,
+      cs: `var b = new List<int>();
+foreach (int x in a)
+    if (x > 0) b.Add(x);   // a feladat feltétele`
+    },
+    "Keresés": {
+      psz: `i := 1
+MÍG a[i] <> keresett
+    i := i + 1
+CIKLUS VÉGE   // biztosan van ilyen elem, ezért megáll`,
+      py: `i = 0
+while a[i] != keresett:
+    i += 1
+# vagy: i = a.index(keresett)`,
+      cs: `int i = 0;
+while (a[i] != keresett) i++;
+// vagy: int i = Array.IndexOf(a, keresett);`
+    }
+  };
+
+  function buildCode(cat) {
+    const c = CODE[cat];
+    const wrap = el('div', { class: 'code-box' });
+    const tabs = el('div', { class: 'code-tabs' });
+    const pres = {};
+    [['psz', 'Pszeudókód'], ['py', 'Python'], ['cs', 'C#']].forEach(([k, label], i) => {
+      const pre = el('pre', { class: 'code' });
+      pre.textContent = c[k];
+      pre.hidden = i !== 0;
+      pres[k] = pre;
+      const b = el('button', { class: 'tab' + (i === 0 ? ' active' : '') }, label);
+      b.onclick = () => {
+        for (const kk in pres) pres[kk].hidden = kk !== k;
+        tabs.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        b.classList.add('active');
+      };
+      tabs.append(b);
+      wrap.append(pre);
+    });
+    wrap.prepend(tabs);
+    return wrap;
+  }
+
+  // ----- Állapot -----
+  const CATS = Object.keys(DATA);
+  const stats = {};
+  CATS.forEach(c => stats[c] = { ok: 0, total: 0 });
+
+  let mode = null;
+  let deck = [];
+  let idx = 0;
+  let answered = false;
+  let runOk = 0;
+  let runTotal = 0;
+
+  // ----- Segédfüggvények -----
+  function el(tag, attrs = {}, ...children) {
+    const n = document.createElement(tag);
+    for (const k in attrs) {
+      if (k === 'class') n.className = attrs[k];
+      else if (k === 'onclick') n.onclick = attrs[k];
+      else n.setAttribute(k, attrs[k]);
+    }
+    children.forEach(c => n.append(typeof c === 'string' ? document.createTextNode(c) : c));
+    return n;
+  }
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  const $ = id => document.getElementById(id);
+  const menuEl = $('menu'), quizEl = $('quiz'), finishEl = $('finish');
+  const topbar = $('topbar'), progress = $('progress'), progressBar = $('progress-bar'), runInfo = $('run-info');
+
+  // ----- Nézetek -----
+  function renderMenu() {
+    mode = null;
+    menuEl.hidden = false; quizEl.hidden = true; finishEl.hidden = true;
+    topbar.hidden = true; progress.hidden = true;
+    menuEl.innerHTML = '';
+
+    const grid = el('div', { class: 'cat-grid' });
+    CATS.forEach(c => {
+      const s = stats[c];
+      grid.append(el('button', { class: 'cat-card', onclick: () => startMode(c) },
+        el('strong', {}, c),
+        el('span', {}, `20 kérdés · eddig: ${s.ok} / ${s.total} helyes`)
+      ));
+    });
+    menuEl.append(grid);
+
+    menuEl.append(el('button', { class: 'cat-card cat-all', onclick: () => startMode('Vegyes') },
+      el('strong', {}, 'Vegyes – mind a 120 kérdés'),
+      el('span', {}, 'Véletlen sorrendben, minden tételből')
+    ));
+  }
+
+  function startMode(m) {
+    mode = m;
+    const cards = [];
+    (m === 'Vegyes' ? CATS : [m]).forEach(c =>
+      DATA[c].forEach(item => cards.push({ cat: c, item }))
+    );
+    deck = (m === 'Vegyes') ? shuffle(cards) : cards;
+    idx = 0;
+    runOk = 0;
+    runTotal = 0;
+    showQuestion();
+  }
+
+  function showQuestion() {
+    if (idx >= deck.length) return showFinish();
+
+    answered = false;
+    menuEl.hidden = true; finishEl.hidden = true; quizEl.hidden = false;
+    topbar.hidden = false; progress.hidden = false;
+
+    const { cat, item } = deck[idx];
+    runInfo.textContent = `Pontszám: ${runOk} / ${runTotal}  ·  ${idx + 1}. kérdés a ${deck.length}-ből`;
+    progressBar.style.width = `${(idx / deck.length) * 100}%`;
+
+    quizEl.innerHTML = '';
+    const card = el('div', { class: 'question-card' });
+    card.append(el('span', { class: 'cat-badge' }, cat));
+    card.append(el('div', { class: 'question-text' }, `${idx + 1}. ${item.q}`));
+
+    const optionsDiv = el('div', { class: 'options' });
+    const opts = item.o.map((text, i) => ({ text, correct: i === item.a }));
+    if (mode === 'Vegyes') shuffle(opts);
+    const btns = opts.map(opt => {
+      const b = el('button', { class: 'btn-option' }, opt.text);
+      b.onclick = () => choose(opt, btns, item, cat);
+      optionsDiv.append(b);
+      return b;
+    });
+    card.append(optionsDiv);
+
+    const feedback = el('div', { class: 'feedback', id: 'feedback', hidden: '' });
+    const explanation = el('div', { class: 'explanation', id: 'explanation', hidden: '' });
+    const nextRow = el('div', { class: 'next-row', id: 'next-row', hidden: '' },
+      el('button', { class: 'btn-primary', onclick: nextQuestion }, idx + 1 < deck.length ? 'Következő kérdés' : 'Eredmény')
+    );
+    card.append(feedback, explanation, nextRow);
+    quizEl.append(card);
+  }
+
+  function choose(opt, btns, item, cat) {
+    if (answered) return;
+    answered = true;
+
+    btns.forEach(b => b.disabled = true);
+    const correctText = item.o[item.a];
+    btns.forEach(b => {
+      if (b.textContent === correctText) b.classList.add('correct');
+    });
+
+    const isRight = opt.correct;
+    if (!isRight) {
+      btns.forEach(b => { if (b.textContent === opt.text) b.classList.add('incorrect'); });
+    }
+
+    stats[cat].total++;
+    runTotal++;
+    if (isRight) { stats[cat].ok++; runOk++; }
+
+    const fb = $('feedback');
+    fb.className = 'feedback ' + (isRight ? 'success' : 'error');
+    fb.textContent = isRight
+      ? '✔ Helyes!'
+      : `✘ Nem helyes. A helyes válasz: ${correctText}`;
+    fb.hidden = false;
+
+    const ex = $('explanation');
+    ex.innerHTML = '';
+    ex.append(el('p', {}, el('strong', {}, 'Magyarázat: '), item.m));
+    ex.append(buildCode(cat));
+    ex.hidden = false;
+
+    runInfo.textContent = `Pontszám: ${runOk} / ${runTotal}  ·  ${idx + 1}. kérdés a ${deck.length}-ből`;
+    $('next-row').hidden = false;
+  }
+
+  function nextQuestion() {
+    idx++;
+    showQuestion();
+  }
+
+  function showFinish() {
+    quizEl.hidden = true; topbar.hidden = true; progress.hidden = true;
+    finishEl.hidden = false;
+    finishEl.innerHTML = '';
+
+    const pct = runTotal ? Math.round((runOk / runTotal) * 100) : 0;
+    finishEl.append(
+      el('h2', {}, 'Kész vagy!'),
+      el('p', {}, `Ebben a körben: ${runOk} / ${runTotal} helyes (${pct}%)`)
+    );
+
+    const list = el('ul', { class: 'stat-list' });
+    CATS.forEach(c => {
+      const s = stats[c];
+      const p = s.total ? Math.round((s.ok / s.total) * 100) : 0;
+      list.append(el('li', {}, `${c}: ${s.ok} / ${s.total} (${p}%)`));
+    });
+    finishEl.append(list);
+
+    finishEl.append(el('div', { class: 'final-actions' },
+      el('button', { class: 'btn-primary', onclick: () => startMode(mode) }, 'Újra ezzel a móddal'),
+      el('button', { class: 'btn-small', onclick: renderMenu }, 'Főmenü')
+    ));
+  }
+
+  $('menu-btn').onclick = renderMenu;
+  renderMenu();
+</script>
+</body>
+</html>
