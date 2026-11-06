@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Progtételgyakorló – Flowgorithm</title>
+<style>
+  [hidden] { display: none !important; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.5; background: #f4f7f6; color: #333;
+    max-width: 980px; margin: 0 auto; padding: 20px;
+  }
+  .container { background: #fff; padding: 25px 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+  h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 0; }
+  .intro { font-style: italic; color: #7f8c8d; }
+
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; }
+  .tab {
+    background: #dfe6e9; border: none; padding: 8px 14px; border-radius: 4px 4px 0 0;
+    cursor: pointer; font-family: inherit; font-weight: bold; color: #2c3e50;
+  }
+  .tab.active { background: #2c3e50; color: #fff; }
+
+  .inputs {
+    background: #e8f4f8; padding: 12px 15px; border-radius: 4px; margin-bottom: 15px;
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+  }
+  .inputs label { font-weight: bold; }
+  .inputs input {
+    padding: 6px 8px; border: 1px solid #bdc3c7; border-radius: 4px; font-family: inherit; font-size: 1rem;
+  }
+  .inputs input#arr-input { width: 260px; }
+  .inputs input#k-input { width: 70px; }
+
+  button.action {
+    background: #3498db; color: #fff; border: none; padding: 7px 14px; border-radius: 4px;
+    cursor: pointer; font-family: inherit; font-weight: bold;
+  }
+  button.action:hover:not([disabled]) { background: #2980b9; }
+  button.action[disabled] { background: #bdc3c7; cursor: not-allowed; }
+  button.secondary { background: #95a5a6; }
+  button.secondary:hover:not([disabled]) { background: #7f8c8d; }
+
+  .topic-desc { margin-bottom: 10px; }
+  .fg-tip {
+    background: #fef9e7; border-left: 5px solid #f1c40f; padding: 10px 14px;
+    border-radius: 0 4px 4px 0; margin-bottom: 15px; font-size: 0.95rem;
+  }
+
+  .panel { display: grid; grid-template-columns: 1fr; gap: 15px; }
+  @media (min-width: 720px) { .panel { grid-template-columns: 1fr 1fr; } }
+
+  .box-card { background: #fafafa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 14px; }
+  .box-card h3 { margin: 0 0 8px 0; color: #2c3e50; font-size: 1rem; }
+
+  .pseudo .pl {
+    font-family: Consolas, 'Courier New', monospace; white-space: pre; padding: 4px 8px;
+    border-radius: 3px; font-size: 0.95rem; color: #2c3e50;
+  }
+  .pseudo .pl.cur { background: #f9e79f; font-weight: bold; }
+
+  .array-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; min-height: 70px; }
+  .col { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+  .col .idx { font-size: 0.8rem; color: #7f8c8d; }
+  .cell {
+    min-width: 46px; text-align: center; padding: 10px 6px; border: 2px solid #bdc3c7;
+    border-radius: 4px; background: #fff; font-weight: bold; transition: all 0.2s ease;
+  }
+  .cell.cur { background: #3498db; border-color: #3498db; color: #fff; }
+  .cell.pick { background: #2ecc71; border-color: #2ecc71; color: #fff; }
+
+  table.vars { border-collapse: collapse; width: 100%; margin-top: 4px; }
+  table.vars td, table.vars th { border: 1px solid #dfe6e9; padding: 5px 8px; text-align: left; }
+  table.vars th { background: #eef3f5; }
+
+  /* Folyamatábra */
+  .flow-card { margin-top: 15px; background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 14px; }
+  .flow-card h3 { margin: 0 0 8px 0; color: #2c3e50; font-size: 1rem; }
+  #flow { width: 100%; height: auto; display: block; }
+  #flow .shape { fill: #ffffff; stroke: #2c3e50; stroke-width: 2; }
+  #flow .shape.hl { fill: #f9e79f; stroke: #e67e22; stroke-width: 3; }
+  #flow .conn { stroke: #555; stroke-width: 1.8; fill: none; }
+  #flow .lbl { font-size: 12px; fill: #7f8c8d; font-family: 'Segoe UI', Tahoma, sans-serif; }
+  #flow .txt { font-size: 13px; fill: #2c3e50; font-family: Consolas, 'Courier New', monospace; }
+
+  .note {
+    margin-top: 12px; background: #eaf7ee; border-left: 5px solid #2ecc71; padding: 10px 14px;
+    border-radius: 0 4px 4px 0; min-height: 44px;
+  }
+  .counter { color: #7f8c8d; margin-top: 6px; font-size: 0.9rem; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; align-items: center; }
+  .out-label { font-weight: bold; margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Progtételgyakorló – Flowgorithm</h1>
+  <p class="intro">
+    Válassz tételt, majd lépésenként kövesd a futást. A pszeudókód minden sora pontosan egy
+    folyamatábra-blokknak felel meg, és ugyanaz a sor világít a pszeudókódban és a folyamatábrán is.
+    A tömbben az aktuális elem kékkel, a kiválasztott elemek zölddel jelennek meg.
+    Próbáld először kézzel megjósolni a következő lépést, és csak utána léptess!
+  </p>
+
+  <div id="tabs" class="tabs"></div>
+
+  <div class="inputs">
+    <div>
+      <label for="arr-input">Tömb (vesszővel elválasztva):</label>
+      <input id="arr-input" type="text" value="3, 8, 2, 15, 7, 10">
+    </div>
+    <div>
+      <label for="k-input">Küszöb / keresett érték (K):</label>
+      <input id="k-input" type="number" value="10">
+    </div>
+    <button id="apply-btn" class="action">Alkalmaz</button>
+    <button id="random-btn" class="action secondary">Véletlen tömb</button>
+  </div>
+
+  <div class="topic-desc" id="topic-desc"></div>
+  <div class="fg-tip" id="fg-tip"></div>
+
+  <div class="panel">
+    <div class="box-card pseudo">
+      <h3>Pszeudókód</h3>
+      <div id="pseudo"></div>
+    </div>
+
+    <div class="box-card">
+      <h3>Tömb</h3>
+      <div id="array" class="array-row"></div>
+
+      <div id="out-wrap" hidden>
+        <div class="out-label">Eredmény (b tömb):</div>
+        <div id="out" class="array-row"></div>
+      </div>
+
+      <h3 style="margin-top:14px;">Változók</h3>
+      <table class="vars">
+        <thead><tr><th>Változó</th><th>Érték</th></tr></thead>
+        <tbody id="vars"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="flow-card">
+    <h3>Folyamatábra</h3>
+    <svg id="flow" viewBox="0 0 600 400" preserveAspectRatio="xMidYMin meet"></svg>
+  </div>
+
+  <div class="note" id="note"></div>
+  <div class="counter" id="counter"></div>
+
+  <div class="controls">
+    <button id="first-btn" class="action secondary">« Elejére</button>
+    <button id="prev-btn" class="action secondary">‹ Vissza</button>
+    <button id="next-btn" class="action">Következő ›</button>
+    <button id="play-btn" class="action secondary">▶ Automatikus</button>
+  </div>
+</div>
+
+<script>
+  const DEFAULT_ARR = [3, 8, 2, 15, 7, 10];
+  let arr = [...DEFAULT_ARR];
+  let K = 10;
+  let topicIdx = 0;
+  let steps = [];
+  let si = 0;
+  let timer = null;
+  let flowNodes = [];
+
+  // Egy lépés: pszeudó-sor indexe, változók, aktuális tömbelem, kiemelt elemek, eredmény, megjegyzés.
+  // Minden lépés EGYETLEN pszeudó-sort jelöl, így a folyamatábrán is pontosan egy blokk (vagy egy ciklusfej) világít.
+  function st(line, vars, idx, note, extra = {}) {
+    return Object.assign({ line, vars, idx, note, picked: [], out: undefined }, extra);
+  }
+
+  // ----- Nyomkövető generátorok -----
+
+  // 0: S := 0 | 1: CIKLUS | 2: S := S + a[i] | 3: CIKLUS VÉGE | 4: Átlag := S / n
+  function* gSum(a) {
+    let S = 0;
+    yield st(0, { S }, -1, "S kezdőértéke 0.");
+    for (let i = 0; i < a.length; i++) {
+      yield st(1, { i: i + 1, S }, -1, `CIKLUS: i = ${i + 1}, még i <= n`);
+      S += a[i];
+      yield st(2, { i: i + 1, S }, i, `S := S + a[${i + 1}] = ${S}`);
+    }
+    yield st(3, { S }, -1, "A ciklus véget ért.");
+    yield st(4, { S, Atlag: (S / a.length).toFixed(2) }, -1,
+      `Az összeg ${S}, az átlag ${S} / ${a.length} = ${(S / a.length).toFixed(2)}.`);
+  }
+
+  // 0: N := 0 | 1: CIKLUS | 2: HA a[i] MOD 2 = 0 AKKOR | 3: N := N + 1 | 4: HA VÉGE | 5: CIKLUS VÉGE
+  function* gCount(a) {
+    let N = 0;
+    yield st(0, { N }, -1, "N kezdőértéke 0.");
+    for (let i = 0; i < a.length; i++) {
+      yield st(1, { i: i + 1, N }, -1, `CIKLUS: i = ${i + 1}, még i <= n`);
+      const ok = a[i] % 2 === 0;
+      yield st(2, { i: i + 1, N }, i,
+        ok ? `a[${i + 1}] = ${a[i]} páros → a feltétel igaz`
+           : `a[${i + 1}] = ${a[i]} páratlan → a feltétel hamis, átugrunk`,
+        { picked: ok ? [i] : [] });
+      if (ok) {
+        N++;
+        yield st(3, { i: i + 1, N }, i, `N := N + 1 → N = ${N}`, { picked: [i] });
+      }
+      yield st(4, { i: i + 1, N }, i, "HA vége", { picked: ok ? [i] : [] });
+    }
+    yield st(5, { N }, -1, `A ciklus véget ért. A páros elemek száma: ${N}`);
+  }
+
+  // 0: max := a[1] | 1: CIKLUS | 2: HA a[i] > max AKKOR | 3: max := a[i] | 4: HA VÉGE | 5: CIKLUS VÉGE
+  function* gMax(a) {
+    let m = a[0], mIdx = 0;
+    yield st(0, { max: m }, 0, `max := a[1] = ${m}`, { picked: [0] });
+    for (let i = 1; i < a.length; i++) {
+      yield st(1, { i: i + 1, max: m }, -1, `CIKLUS: i = ${i + 1}, még i <= n`, { picked: [mIdx] });
+      const up = a[i] > m;
+      yield st(2, { i: i + 1, max: m }, i,
+        up ? `a[${i + 1}] = ${a[i]} > ${m} → a feltétel igaz`
+           : `a[${i + 1}] = ${a[i]} nem nagyobb ${m}-nál → a feltétel hamis`,
+        { picked: [mIdx] });
+      if (up) {
+        m = a[i]; mIdx = i;
+        yield st(3, { i: i + 1, max: m }, i, `max := a[${i + 1}] = ${m}`, { picked: [mIdx] });
+      }
+      yield st(4, { i: i + 1, max: m }, i, "HA vége", { picked: [mIdx] });
+    }
+    yield st(5, { max: m }, -1, `A legnagyobb elem: ${m} (a(z) ${mIdx + 1}. helyen).`, { picked: [mIdx] });
+  }
+
+  // 0: min := a[1] | 1: CIKLUS | 2: HA a[i] < min AKKOR | 3: min := a[i] | 4: HA VÉGE | 5: CIKLUS VÉGE
+  function* gMin(a) {
+    let m = a[0], mIdx = 0;
+    yield st(0, { min: m }, 0, `min := a[1] = ${m}`, { picked: [0] });
+    for (let i = 1; i < a.length; i++) {
+      yield st(1, { i: i + 1, min: m }, -1, `CIKLUS: i = ${i + 1}, még i <= n`, { picked: [mIdx] });
+      const down = a[i] < m;
+      yield st(2, { i: i + 1, min: m }, i,
+        down ? `a[${i + 1}] = ${a[i]} < ${m} → a feltétel igaz`
+             : `a[${i + 1}] = ${a[i]} nem kisebb ${m}-nél → a feltétel hamis`,
+        { picked: [mIdx] });
+      if (down) {
+        m = a[i]; mIdx = i;
+        yield st(3, { i: i + 1, min: m }, i, `min := a[${i + 1}] = ${m}`, { picked: [mIdx] });
+      }
+      yield st(4, { i: i + 1, min: m }, i, "HA vége", { picked: [mIdx] });
+    }
+    yield st(5, { min: m }, -1, `A legkisebb elem: ${m} (a(z) ${mIdx + 1}. helyen).`, { picked: [mIdx] });
+  }
+
+  // 0: van := HAMIS | 1: i := 1 | 2: MÍG | 3: HA a[i] > K AKKOR | 4: van := IGAZ | 5: HA VÉGE | 6: i := i + 1 | 7: CIKLUS VÉGE
+  function* gEld(a, K) {
+    let van = false;
+    yield st(0, { van }, -1, "van kezdőértéke HAMIS.");
+    yield st(1, { i: 1, van }, -1, "i := 1");
+    let k = 0;
+    while (true) {
+      const cond = k < a.length && !van;
+      yield st(2, { i: k + 1, van }, -1,
+        cond ? `Feltétel igaz: ${k + 1} <= n és van = HAMIS → a ciklus fut`
+             : `Feltétel hamis: a ciklus vége`);
+      if (!cond) break;
+      const ok = a[k] > K;
+      yield st(3, { i: k + 1, van }, k,
+        ok ? `a[${k + 1}] = ${a[k]} > ${K} → a feltétel igaz`
+           : `a[${k + 1}] = ${a[k]} nem nagyobb ${K}-nál → a feltétel hamis`);
+      if (ok) {
+        van = true;
+        yield st(4, { i: k + 1, van }, k, "van := IGAZ", {});
+      }
+      yield st(5, { i: k + 1, van }, k, "HA vége");
+      k++;
+      yield st(6, { i: k + 1, van }, -1, `i := i + 1 → i = ${k + 1}`);
+    }
+    yield st(7, { i: k + 1, van }, -1,
+      van ? "A ciklus leállt, van = IGAZ: létezik ilyen elem."
+          : "A ciklus vége, van = HAMIS: nincs ilyen elem.");
+  }
+
+  // 0: db := 0 | 1: CIKLUS | 2: HA a[i] > K AKKOR | 3: db := db + 1 | 4: b[db] := a[i] | 5: HA VÉGE | 6: CIKLUS VÉGE
+  function* gSel(a, K) {
+    let db = 0;
+    const b = [], picked = [];
+    yield st(0, { db }, -1, "db := 0", { out: [] });
+    for (let i = 0; i < a.length; i++) {
+      yield st(1, { i: i + 1, db }, -1, `CIKLUS: i = ${i + 1}, még i <= n`,
+        { out: [...b], picked: [...picked] });
+      const ok = a[i] > K;
+      yield st(2, { i: i + 1, db }, i,
+        ok ? `a[${i + 1}] = ${a[i]} > ${K} → a feltétel igaz`
+           : `a[${i + 1}] = ${a[i]} nem nagyobb ${K}-nál → a feltétel hamis`,
+        { out: [...b], picked: [...picked] });
+      if (ok) {
+        db++; b.push(a[i]); picked.push(i);
+        yield st(3, { i: i + 1, db }, i, `db := db + 1 → db = ${db}`,
+          { out: [...b], picked: [...picked] });
+        yield st(4, { i: i + 1, db }, i, `b[${db}] := ${a[i]}`,
+          { out: [...b], picked: [...picked] });
+      }
+      yield st(5, { i: i + 1, db }, i, "HA vége", { out: [...b], picked: [...picked] });
+    }
+    yield st(6, { db }, -1, `A ciklus véget ért. Kiválogatott elemek száma: ${db}`,
+      { out: [...b], picked: [...picked] });
+  }
+
+  // 0: i := 1 | 1: MÍG a[i] <> K | 2: i := i + 1 | 3: CIKLUS VÉGE | 4: KI: i
+  function* gKer(a, K) {
+    let i = 0;
+    yield st(0, { i: 1 }, -1, "i := 1");
+    while (i < a.length && a[i] !== K) {
+      yield st(1, { i: i + 1 }, i, `a[${i + 1}] = ${a[i]} ≠ ${K} → a feltétel igaz, a ciklus fut`);
+      i++;
+      yield st(2, { i: i + 1 }, -1, `i := i + 1 → i = ${i + 1}`);
+    }
+    if (i < a.length) {
+      yield st(1, { i: i + 1 }, i, `a[${i + 1}] = ${K} → a feltétel hamis, a ciklus megáll`, { picked: [i] });
+      yield st(3, { i: i + 1 }, i, "CIKLUS VÉGE", { picked: [i] });
+      yield st(4, { i: i + 1 }, i, `KI: ${i + 1}. Az első ${K} a(z) ${i + 1}. helyen van.`, { picked: [i] });
+    } else {
+      yield st(1, { i: i + 1 }, -1, `Nincs ${K} a tömbben – a keresés feltétele nem teljesül.`);
+    }
+  }
+
+  // ----- Folyamatábra-elemek -----
+  const term = text => ({ t: 'term', text });
+  const asg = (text, lines) => ({ t: 'assign', text, lines });
+  const outp = (text, lines) => ({ t: 'out', text, lines });
+  const iff = (text, lines, yes) => ({ t: 'if', text, lines, yes: yes || [] });
+  const loop = (text, lines, body) => ({ t: 'loop', text, lines, body });
+
+  // ----- Tételek -----
+  // lines(): a pszeudókód sorai (az index a generátor "line" értéke)
+  // flow(): a folyamatábra; minden blokk "lines" listája a hozzá tartozó pszeudó-sorokat adja
+  const TOPICS = [
+    {
+      name: "Összegzés",
+      desc: "Az elemek összegét számoljuk ki: egy akkumulátor változóhoz minden elemet hozzáadunk. Az átlaghoz az összeget el kell osztani az elemek számával.",
+      fg: "Flowgorithm: Assignment (S := 0), For ciklus (i = 1-től n-ig), Assignment (S := S + a[i]), majd Assignment (Átlag := S / n).",
+      lines: () => ["S := 0", "CIKLUS i := 1-től n-ig", "    S := S + a[i]", "CIKLUS VÉGE", "Átlag := S / n"],
+      flow: () => [term('Start'), asg('S := 0', [0]),
+        loop('CIKLUS i := 1-től n-ig', [1, 3], [asg('S := S + a[i]', [2])]),
+        asg('Átlag := S / n', [4]), term('End')],
+      gen: gSum
+    },
+    {
+      name: "Megszámlálás",
+      desc: "Azt számoljuk meg, hány elem felel meg egy feltételnek. A példában a páros számokat számoljuk.",
+      fg: "Flowgorithm: Assignment (N := 0), For ciklus, Decision (a[i] MOD 2 = 0), a Yes ágon Assignment (N := N + 1).",
+      lines: () => [
+        "N := 0",
+        "CIKLUS i := 1-től n-ig",
+        "    HA a[i] MOD 2 = 0 AKKOR",
+        "        N := N + 1",
+        "    HA VÉGE",
+        "CIKLUS VÉGE"
+      ],
+      flow: () => [term('Start'), asg('N := 0', [0]),
+        loop('CIKLUS i := 1-től n-ig', [1, 5],
+          [iff('a[i] MOD 2 = 0 ?', [2, 4], [asg('N := N + 1', [3])])]),
+        term('End')],
+      gen: gCount
+    },
+    {
+      name: "Maximumkiválasztás",
+      desc: "A tömb legnagyobb elemét keressük. Kiindulunk az első elemből, és minden nagyobb elemnél frissítjük a maximumot.",
+      fg: "Flowgorithm: Assignment (max := a[1]), For ciklus (i = 2-től n-ig), Decision (a[i] > max), a Yes ágon Assignment (max := a[i]).",
+      lines: () => [
+        "max := a[1]",
+        "CIKLUS i := 2-től n-ig",
+        "    HA a[i] > max AKKOR",
+        "        max := a[i]",
+        "    HA VÉGE",
+        "CIKLUS VÉGE"
+      ],
+      flow: () => [term('Start'), asg('max := a[1]', [0]),
+        loop('CIKLUS i := 2-től n-ig', [1, 5],
+          [iff('a[i] > max ?', [2, 4], [asg('max := a[i]', [3])])]),
+        term('End')],
+      gen: gMax
+    },
+    {
+      name: "Minimumkiválasztás",
+      desc: "A tömb legkisebb elemét keressük. Kiindulunk az első elemből, és minden kisebb elemnél frissítjük a minimumot.",
+      fg: "Flowgorithm: Assignment (min := a[1]), For ciklus (i = 2-től n-ig), Decision (a[i] < min), a Yes ágon Assignment (min := a[i]).",
+      lines: () => [
+        "min := a[1]",
+        "CIKLUS i := 2-től n-ig",
+        "    HA a[i] < min AKKOR",
+        "        min := a[i]",
+        "    HA VÉGE",
+        "CIKLUS VÉGE"
+      ],
+      flow: () => [term('Start'), asg('min := a[1]', [0]),
+        loop('CIKLUS i := 2-től n-ig', [1, 5],
+          [iff('a[i] < min ?', [2, 4], [asg('min := a[i]', [3])])]),
+        term('End')],
+      gen: gMin
+    },
+    {
+      name: "Eldöntés",
+      desc: "Igen/nem kérdés: van-e a tömbben a feltételnek megfelelő elem? A ciklus akkor áll le, amikor talált egyet.",
+      fg: "Flowgorithm: Assignment (van := FALSE), Assignment (i := 1), While ciklus (i <= n AND NOT van), Decision (a[i] > K), a Yes ágon Assignment (van := TRUE).",
+      lines: () => [
+        "van := HAMIS",
+        "i := 1",
+        "MÍG i <= n ÉS NEM van",
+        `    HA a[i] > ${K} AKKOR`,
+        "        van := IGAZ",
+        "    HA VÉGE",
+        "    i := i + 1",
+        "CIKLUS VÉGE"
+      ],
+      flow: () => [term('Start'), asg('van := HAMIS', [0]), asg('i := 1', [1]),
+        loop('MÍG i <= n ÉS NEM van', [2, 7], [
+          iff(`a[i] > ${K} ?`, [3, 5], [asg('van := IGAZ', [4])]),
+          asg('i := i + 1', [6])
+        ]),
+        term('End')],
+      gen: gEld
+    },
+    {
+      name: "Kiválogatás",
+      desc: "A feltételnek megfelelő elemeket új tömbbe (b) másoljuk. Itt a K-nál nagyobb elemeket gyűjtjük ki.",
+      fg: "Flowgorithm: Assignment (db := 0), For ciklus, Decision (a[i] > K), a Yes ágon Assignment (db := db + 1) és Assignment (b[db] := a[i]).",
+      lines: () => [
+        "db := 0",
+        "CIKLUS i := 1-től n-ig",
+        `    HA a[i] > ${K} AKKOR`,
+        "        db := db + 1",
+        "        b[db] := a[i]",
+        "    HA VÉGE",
+        "CIKLUS VÉGE"
+      ],
+      flow: () => [term('Start'), asg('db := 0', [0]),
+        loop('CIKLUS i := 1-től n-ig', [1, 6], [
+          iff(`a[i] > ${K} ?`, [2, 5], [asg('db := db + 1', [3]), asg('b[db] := a[i]', [4])])
+        ]),
+        term('End')],
+      gen: gSel
+    },
+    {
+      name: "Keresés",
+      desc: "Megkeressük a K értéket, és az első előfordulásának helyét adjuk meg. Ha a feladat szerint biztosan van ilyen elem, a ciklus nem fut túl a tömbön.",
+      fg: "Flowgorithm: Assignment (i := 1), While ciklus (a[i] <> K), Assignment (i := i + 1), majd Output (i).",
+      lines: () => ["i := 1", `MÍG a[i] <> ${K}`, "    i := i + 1", "CIKLUS VÉGE", "KI: i"],
+      flow: () => [term('Start'), asg('i := 1', [0]),
+        loop(`MÍG a[i] <> ${K}`, [1, 3], [asg('i := i + 1', [2])]),
+        outp('KI: i', [4]), term('End')],
+      gen: gKer
+    }
+  ];
+
+  // ----- Felület segédek -----
+  function el(tag, attrs = {}, ...children) {
+    const n = document.createElement(tag);
+    for (const k in attrs) {
+      if (k === 'class') n.className = attrs[k];
+      else if (k === 'onclick') n.onclick = attrs[k];
+      else n.setAttribute(k, attrs[k]);
+    }
+    children.forEach(c => n.append(typeof c === 'string' ? document.createTextNode(c) : c));
+    return n;
+  }
+  const $ = id => document.getElementById(id);
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  function svgEl(tag, attrs, parent) {
+    const e = document.createElementNS(SVG_NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+
+  // ----- Folyamatábra rajzolása -----
+  const SH = { rectW: 230, rectH: 40, diaW: 230, diaH: 64, hexW: 250, hexH: 44,
+               termW: 150, termH: 34, gap: 24, skew: 18, indent: 28 };
+  const CX = 300;
+
+  function drawFlow(items) {
+    const svg = $('flow');
+    svg.innerHTML = '';
+    const defs = svgEl('defs', {}, svg);
+    const mk = svgEl('marker', { id: 'arr', markerWidth: 10, markerHeight: 10, refX: 9, refY: 3, orient: 'auto' }, defs);
+    svgEl('path', { d: 'M0,0 L9,3 L0,6 z', fill: '#555' }, mk);
+
+    const ctx = { svg, maxY: 0 };
+    flowNodes = [];
+    drawSeq(items, CX, 10, ctx, null);
+    svg.setAttribute('viewBox', `0 0 600 ${Math.ceil(ctx.maxY + 30)}`);
+  }
+
+  // Elemsorozat egymás alá rajzolása. A visszatérési érték az utolsó elem kimenete.
+  function drawSeq(items, cx, y0, ctx, from) {
+    let cur = from;
+    let cy = y0;
+    for (const it of items) {
+      const g = placeItem(it, cx, cy, ctx);
+      if (cur) connect(cur, g, ctx);
+      cur = { pt: g.bottom, kind: g.kind, meta: g };
+      cy = g.bottom.y + SH.gap;
+    }
+    return cur;
+  }
+
+  function polyline(ctx, pts, arrow = true) {
+    const d = pts.map((p, i) => (i === 0 ? 'M' : 'L') + p.x + ',' + p.y).join(' ');
+    svgEl('path', { class: 'conn', d, 'marker-end': arrow ? 'url(#arr)' : null }, ctx.svg);
+  }
+  function line(ctx, x1, y1, x2, y2) {
+    svgEl('path', { class: 'conn', d: `M${x1},${y1} L${x2},${y2}`, 'marker-end': 'url(#arr)' }, ctx.svg);
+  }
+  function label(ctx, x, y, text) {
+    svgEl('text', { class: 'lbl', x, y }, ctx.svg).textContent = text;
+  }
+
+  function connect(cur, g, ctx) {
+    // Ciklusból kilépés: a ciklusfej bal oldalából a következő elem bal oldalába
+    if (cur.kind === 'loop') {
+      const e = cur.meta.exitLeft;
+      const route = Math.min(e.x, g.left.x) - SH.indent;
+      polyline(ctx, [e, { x: route, y: e.y }, { x: route, y: g.left.y }, g.left]);
+      label(ctx, e.x + 4, e.y - 6, 'Ki');
+      return;
+    }
+    // Elágazás "Nem" ága: a rombusz jobb sarkából a következő elem jobb oldalába
+    if (cur.kind === 'if' && cur.meta.right) {
+      const nr = cur.meta.right;
+      const route = Math.max(nr.x, g.right.x) + SH.indent;
+      polyline(ctx, [nr, { x: route, y: nr.y }, { x: route, y: g.right.y }, g.right]);
+      label(ctx, nr.x + 4, nr.y - 6, 'Nem');
+    }
+    line(ctx, cur.pt.x, cur.pt.y, g.top.x, g.top.y);
+  }
+
+  function registerNode(lines, el) {
+    flowNodes.push({ lines: lines || [], el });
+  }
+
+  function placeItem(it, cx, y, ctx) {
+    let g;
+    if (it.t === 'term') {
+      const w = SH.termW, h = SH.termH;
+      const r = svgEl('rect', { class: 'shape', x: cx - w / 2, y, width: w, height: h, rx: 17 }, ctx.svg);
+      registerNode([it.text === 'Start' ? 'START' : 'END'], r);
+      svgEl('text', { class: 'txt', x: cx, y: y + h / 2 + 5, 'text-anchor': 'middle' }, ctx.svg).textContent = it.text;
+      g = mkG('term', cx, y, w, h);
+    } else if (it.t === 'assign') {
+      const w = SH.rectW, h = SH.rectH;
+      const r = svgEl('rect', { class: 'shape', x: cx - w / 2, y, width: w, height: h }, ctx.svg);
+      svgEl('text', { class: 'txt', x: cx, y: y + h / 2 + 5, 'text-anchor': 'middle' }, ctx.svg).textContent = it.text;
+      registerNode(it.lines, r);
+      g = mkG('assign', cx, y, w, h);
+    } else if (it.t === 'out') {
+      const w = SH.rectW, h = SH.rectH, s = SH.skew;
+      const pts = [[cx - w / 2 + s, y], [cx + w / 2, y], [cx + w / 2 - s, y + h], [cx - w / 2, y + h]]
+        .map(p => p.join(',')).join(' ');
+      const p = svgEl('polygon', { class: 'shape', points: pts }, ctx.svg);
+      svgEl('text', { class: 'txt', x: cx, y: y + h / 2 + 5, 'text-anchor': 'middle' }, ctx.svg).textContent = it.text;
+      registerNode(it.lines, p);
+      g = mkG('out', cx, y, w, h);
+    } else if (it.t === 'if') {
+      const w = SH.diaW, h = SH.diaH;
+      const pts = [[cx, y], [cx + w / 2, y + h / 2], [cx, y + h], [cx - w / 2, y + h / 2]]
+        .map(p => p.join(',')).join(' ');
+      const d = svgEl('polygon', { class: 'shape', points: pts }, ctx.svg);
+      svgEl('text', { class: 'txt', x: cx, y: y + h / 2 + 5, 'text-anchor': 'middle' }, ctx.svg).textContent = it.text;
+      registerNode(it.lines, d);
+      g = mkG('if', cx, y, w, h);
+      // "Igen" ág: lefelé, ha van belőle kiinduló elem
+      let bottom = { x: cx, y: y + h };
+      if (it.yes.length) {
+        const inner = drawSeq(it.yes, cx, y + h + SH.gap, ctx, { pt: { x: cx, y: y + h }, kind: 'plain', meta: null });
+        label(ctx, cx + 6, y + h + SH.gap / 2 + 4, 'Igen');
+        bottom = inner.pt;
+      }
+      g.bottom = bottom;
+      g.right = { x: cx + w / 2, y: y + h / 2 };
+    } else if (it.t === 'loop') {
+      const w = SH.hexW, h = SH.hexH, s = 16;
+      const hy = y + h / 2;
+      const pts = [[cx - w / 2, hy], [cx - w / 2 + s, y], [cx + w / 2 - s, y], [cx + w / 2, hy],
+                   [cx + w / 2 - s, y + h], [cx - w / 2 + s, y + h]]
+        .map(p => p.join(',')).join(' ');
+      const hex = svgEl('polygon', { class: 'shape', points: pts }, ctx.svg);
+      svgEl('text', { class: 'txt', x: cx, y: hy + 5, 'text-anchor': 'middle' }, ctx.svg).textContent = it.text;
+      registerNode(it.lines, hex);
+
+      const hdrBottom = { x: cx, y: y + h };
+      const body = drawSeq(it.body, cx, y + h + SH.gap, ctx, { pt: hdrBottom, kind: 'plain', meta: null });
+      label(ctx, cx + 6, y + h + SH.gap / 2 + 4, 'Igen');
+
+      const hdrRight = { x: cx + w / 2, y: hy };
+      const backX = cx + w / 2 + SH.indent;
+      const backY = body.pt.y + 14;
+      // Visszacsatolás a ciklusfejbe
+      polyline(ctx, [body.pt, { x: body.pt.x, y: backY }, { x: backX, y: backY }, { x: backX, y: hy }, hdrRight]);
+      // Ha a törzs végén elágazás van, a "Nem" ága is a visszacsatolásba fut
+      if (body.kind === 'if' && body.meta.right) {
+        polyline(ctx, [body.meta.right, { x: backX, y: body.meta.right.y }], false);
+      }
+      ctx.maxY = Math.max(ctx.maxY, backY);
+
+      g = mkG('loop', cx, y, w, h);
+      g.bottom = { x: cx, y: backY };
+      g.exitLeft = { x: cx - w / 2, y: hy };
+      g.left = { x: cx - w / 2, y: hy };
+      g.right = hdrRight;
+    }
+    ctx.maxY = Math.max(ctx.maxY, g.bottom.y);
+    return g;
+  }
+
+  function mkG(kind, cx, y, w, h) {
+    return {
+      kind,
+      top: { x: cx, y },
+      bottom: { x: cx, y: y + h },
+      left: { x: cx - w / 2, y: y + h / 2 },
+      right: { x: cx + w / 2, y: y + h / 2 },
+      w, h
+    };
+  }
+
+  // ----- Vezérlés -----
+  function buildTabs() {
+    const tabs = $('tabs');
+    tabs.innerHTML = '';
+    TOPICS.forEach((t, i) => {
+      tabs.append(el('button', {
+        class: 'tab' + (i === topicIdx ? ' active' : ''),
+        onclick: () => { topicIdx = i; stop(); build(); buildTabs(); }
+      }, t.name));
+    });
+  }
+
+  function build() {
+    const T = TOPICS[topicIdx];
+    const body = Array.from(T.gen(arr, K));
+    const last = body[body.length - 1];
+    // Start lépés az elején, End lépés a végén: a folyamatábrán a Start, illetve az End blokk világít
+    steps = [
+      st('START', {}, -1, 'A program indul (Start).'),
+      ...body,
+      Object.assign({}, last, { line: 'END', idx: -1, note: 'A program véget ért (End).' })
+    ];
+    si = 0;
+    $('topic-desc').textContent = T.desc;
+    $('fg-tip').textContent = T.fg;
+    drawFlow(T.flow(K));
+    render();
+  }
+
+  function render() {
+    const T = TOPICS[topicIdx];
+    const s = steps[si];
+
+    // pszeudókód
+    const pseudo = $('pseudo');
+    pseudo.innerHTML = '';
+    pseudo.append(el('div', { class: 'pl' + (s && s.line === 'START' ? ' cur' : '') }, 'Start'));
+    T.lines().forEach((t, i) => {
+      pseudo.append(el('div', { class: 'pl' + (s && s.line === i ? ' cur' : '') }, t));
+    });
+    pseudo.append(el('div', { class: 'pl' + (s && s.line === 'END' ? ' cur' : '') }, 'End'));
+
+    // folyamatábra: ugyanaz a sor világít, mint a pszeudókódban
+    flowNodes.forEach(n => {
+      const hl = !!s && n.lines.includes(s.line);
+      n.el.setAttribute('class', 'shape' + (hl ? ' hl' : ''));
+    });
+
+    // tömb
+    const arrEl = $('array');
+    arrEl.innerHTML = '';
+    arr.forEach((v, i) => {
+      const cls = ['cell'];
+      if (s && s.idx === i) cls.push('cur');
+      if (s && s.picked && s.picked.includes(i)) cls.push('pick');
+      arrEl.append(el('div', { class: 'col' },
+        el('div', { class: 'idx' }, String(i + 1)),
+        el('div', { class: cls.join(' ') }, String(v))
+      ));
+    });
+
+    // eredmény tömb (Kiválogatás)
+    const outWrap = $('out-wrap');
+    const outEl = $('out');
+    if (s && s.out !== undefined) {
+      outWrap.hidden = false;
+      outEl.innerHTML = '';
+      if (s.out.length === 0) outEl.append(el('div', { class: 'cell' }, '–'));
+      s.out.forEach((v, i) => {
+        outEl.append(el('div', { class: 'col' },
+          el('div', { class: 'idx' }, String(i + 1)),
+          el('div', { class: 'cell pick' }, String(v))
+        ));
+      });
+    } else {
+      outWrap.hidden = true;
+    }
+
+    // változók
+    const varsEl = $('vars');
+    varsEl.innerHTML = '';
+    if (s) {
+      Object.entries(s.vars).forEach(([k, v]) => {
+        varsEl.append(el('tr', {}, el('td', {}, k), el('td', {}, String(v))));
+      });
+    }
+
+    $('note').textContent = s ? s.note : '';
+    $('counter').textContent = steps.length ? `${si + 1} / ${steps.length} lépés` : '';
+
+    $('first-btn').disabled = si === 0;
+    $('prev-btn').disabled = si === 0;
+    $('next-btn').disabled = si >= steps.length - 1;
+  }
+
+  function next() { if (si < steps.length - 1) { si++; render(); } else stop(); }
+  function prev() { if (si > 0) { si--; render(); } }
+  function first() { si = 0; render(); }
+
+  function togglePlay() {
+    if (timer) { stop(); return; }
+    $('play-btn').textContent = '⏸ Szünet';
+    timer = setInterval(() => {
+      if (si < steps.length - 1) { si++; render(); }
+      else stop();
+    }, 900);
+  }
+  function stop() {
+    if (timer) clearInterval(timer);
+    timer = null;
+    $('play-btn').textContent = '▶ Automatikus';
+  }
+
+  function parseArr(text) {
+    return text.split(',').map(s => s.trim()).filter(s => s !== '').map(Number).filter(n => !isNaN(n));
+  }
+
+  function apply() {
+    const parsed = parseArr($('arr-input').value);
+    if (parsed.length === 0) {
+      alert('Adj meg legalább egy számot, vesszővel elválasztva!');
+      return;
+    }
+    arr = parsed;
+    K = Number($('k-input').value);
+    stop();
+    build();
+  }
+
+  function randomArr() {
+    const n = 5 + Math.floor(Math.random() * 4);
+    arr = Array.from({ length: n }, () => 1 + Math.floor(Math.random() * 20));
+    $('arr-input').value = arr.join(', ');
+    stop();
+    build();
+  }
+
+  $('apply-btn').onclick = apply;
+  $('random-btn').onclick = randomArr;
+  $('next-btn').onclick = () => { stop(); next(); };
+  $('prev-btn').onclick = () => { stop(); prev(); };
+  $('first-btn').onclick = () => { stop(); first(); };
+  $('play-btn').onclick = togglePlay;
+  $('k-input').addEventListener('keydown', e => { if (e.key === 'Enter') apply(); });
+  $('arr-input').addEventListener('keydown', e => { if (e.key === 'Enter') apply(); });
+
+  buildTabs();
+  build();
+</script>
+</body>
+</html>
