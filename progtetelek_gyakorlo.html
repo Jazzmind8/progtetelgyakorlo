@@ -608,8 +608,1175 @@ while (a[i] != keresett) i++;
     }
   };
 
-  function buildCode(cat) {
-    const c = CODE[cat];
+  // ----- Kódminták kérdésenként (a feladat adataihoz igazítva) -----
+  const CODEQ = {
+    "Összegzés": [
+      { psz: `S := 0
+CIKLUS i := 1-től 12-ig
+    S := S + bevetel[i]
+CIKLUS VÉGE`,
+        py: `s = 0
+for x in bevetel:
+    s += x`,
+        cs: `int s = 0;
+foreach (int x in bevetel)
+    s += x;` },
+      { psz: `S := 0
+CIKLUS i := 1-től n-ig
+    S := S + pont[i]
+CIKLUS VÉGE
+Atlag := S / n`,
+        py: `s = 0
+for p in pontok:
+    s += p
+atlag = s / len(pontok)`,
+        cs: `int s = 0;
+foreach (int p in pontok) s += p;
+double atlag = (double)s / pontok.Length;` },
+      { psz: `S := 0
+CIKLUS i := 1-től n-ig
+    S := S + ar[i]
+CIKLUS VÉGE`,
+        py: `osszeg = 0
+for ar in kosar:
+    osszeg += ar`,
+        cs: `int osszeg = 0;
+foreach (int ar in kosar) osszeg += ar;` },
+      { psz: `S := 0
+CIKLUS i := 1-től n-ig
+    HA a[i] MOD 2 = 0 AKKOR S := S + a[i]
+CIKLUS VÉGE`,
+        py: `s = 0
+for x in a:
+    if x % 2 == 0:
+        s += x`,
+        cs: `int s = 0;
+foreach (int x in a)
+    if (x % 2 == 0) s += x;` },
+      { psz: `S := 0
+MÍG NEM vége a fájlnak
+    OLVASS BE x-et a fájlból
+    S := S + x
+CIKLUS VÉGE`,
+        py: `s = 0
+with open('szamok.txt') as f:
+    for sor in f:
+        s += int(sor)`,
+        cs: `int s = 0;
+foreach (string sor in File.ReadLines("szamok.txt"))
+    s += int.Parse(sor);` },
+      { psz: `T := 0
+CIKLUS i := 1-től n-ig
+    T := T + ido[i]
+CIKLUS VÉGE`,
+        py: `t = 0
+for ido_kor in korok:
+    t += ido_kor`,
+        cs: `int t = 0;
+foreach (int ido_kor in korok) t += ido_kor;` },
+      { psz: `S := 0
+CIKLUS i := 1-től 30-ig
+    S := S + fogyasztas[i]
+CIKLUS VÉGE`,
+        py: `s = 0
+for f in fogyasztas:
+    s += f`,
+        cs: `int s = 0;
+foreach (int f in fogyasztas) s += f;` },
+      { psz: `S := 0
+CIKLUS i := 1-től n-ig
+    S := S + a[i]
+CIKLUS VÉGE`,
+        py: `s = 0
+for x in a:
+    s += x`,
+        cs: `int s = 0;
+foreach (int x in a) s += x;` },
+      { psz: `S := 0
+CIKLUS i := 1-től 7-ig
+    S := S + napi[i]
+CIKLUS VÉGE`,
+        py: `s = 0
+for n in napi:
+    s += n`,
+        cs: `int s = 0;
+foreach (int n in napi) s += n;` },
+      { psz: `S := 0
+CIKLUS i := 1-től n-ig
+    S := S + a[i] * a[i]
+CIKLUS VÉGE`,
+        py: `s = 0
+for x in a:
+    s += x * x`,
+        cs: `int s = 0;
+foreach (int x in a) s += x * x;` },
+      { psz: `S := 0
+CIKLUS i := 1-től n-ig
+    S := S + jegy[i]
+CIKLUS VÉGE
+Atlag := S / n`,
+        py: `s = 0
+for j in jegyek:
+    s += j
+atlag = s / len(jegyek)`,
+        cs: `int s = 0;
+foreach (int j in jegyek) s += j;
+double atlag = (double)s / jegyek.Length;` },
+      { psz: `S := 0
+CIKLUS i := 1-től n-ig
+    S := S + db[i]
+CIKLUS VÉGE`,
+        py: `osszes = 0
+for d in polcok:
+    osszes += d`,
+        cs: `int osszes = 0;
+foreach (int d in polcok) osszes += d;` },
+      { psz: `S := 0
+CIKLUS i := 1-től n-ig
+    S := S + ber[i]
+CIKLUS VÉGE`,
+        py: `osszeg = 0
+for b in berek:
+    osszeg += b`,
+        cs: `int osszeg = 0;
+foreach (int b in berek) osszeg += b;` },
+      { psz: `S := 0
+CIKLUS i := 1-től n-ig
+    HA a[i] > 0 AKKOR S := S + a[i]
+CIKLUS VÉGE`,
+        py: `s = 0
+for x in a:
+    if x > 0:
+        s += x`,
+        cs: `int s = 0;
+foreach (int x in a)
+    if (x > 0) s += x;` },
+      { psz: `S := 0
+MÍG NEM vége a fájlnak
+    OLVASS BE x-et
+    S := S + x
+CIKLUS VÉGE`,
+        py: `s = 0
+for sor in open('szamok.txt'):
+    s += int(sor)`,
+        cs: `int s = 0;
+foreach (string sor in File.ReadLines("szamok.txt"))
+    s += int.Parse(sor);` },
+      { psz: `S := 0
+CIKLUS i := 1-től 7-ig
+    S := S + vendeg[i]
+CIKLUS VÉGE
+Atlag := S / 7`,
+        py: `s = 0
+for v in vendegek:
+    s += v
+atlag = s / 7`,
+        cs: `int s = 0;
+foreach (int v in vendegek) s += v;
+double atlag = s / 7.0;` },
+      { psz: `S := 0
+CIKLUS i := 1-től n-ig
+    HA a[i] MOD 2 = 1 AKKOR S := S + a[i]
+CIKLUS VÉGE`,
+        py: `s = 0
+for x in a:
+    if x % 2 == 1:
+        s += x`,
+        cs: `int s = 0;
+foreach (int x in a)
+    if (x % 2 == 1) s += x;` },
+      { psz: `S := 0
+CIKLUS i := 1-től n-ig
+    S := S + szakasz[i]
+CIKLUS VÉGE`,
+        py: `tav = 0
+for sz in szakaszok:
+    tav += sz`,
+        cs: `int tav = 0;
+foreach (int sz in szakaszok) tav += sz;` },
+      { psz: `S := 0
+CIKLUS i := 1-től n-ig
+    S := S + 2 * a[i]
+CIKLUS VÉGE`,
+        py: `s = 0
+for x in a:
+    s += 2 * x`,
+        cs: `int s = 0;
+foreach (int x in a) s += 2 * x;` },
+      { psz: `S := 0
+CIKLUS i := 1-től n-ig
+    S := S + magassag[i]
+CIKLUS VÉGE`,
+        py: `s = 0
+for m in magassagok:
+    s += m`,
+        cs: `int s = 0;
+foreach (int m in magassagok) s += m;` }
+    ],
+
+    "Megszámlálás": [
+      { psz: `N := 0
+CIKLUS i := 1-től n-ig
+    HA szoveg[i] = ' ' AKKOR N := N + 1
+CIKLUS VÉGE`,
+        py: `n = 0
+for c in szoveg:
+    if c == ' ':
+        n += 1`,
+        cs: `int n = 0;
+foreach (char c in szoveg)
+    if (c == ' ') n++;` },
+      { psz: `N := 0
+CIKLUS i := 1-től n-ig
+    HA osztalyzat[i] = 3 AKKOR N := N + 1
+CIKLUS VÉGE`,
+        py: `n = 0
+for jegy in naplo:
+    if jegy == 3:
+        n += 1`,
+        cs: `int n = 0;
+foreach (int jegy in naplo)
+    if (jegy == 3) n++;` },
+      { psz: `N := 0
+CIKLUS i := 1-től n-ig
+    HA a[i] MOD 2 = 0 AKKOR N := N + 1
+CIKLUS VÉGE`,
+        py: `n = 0
+for x in a:
+    if x % 2 == 0:
+        n += 1`,
+        cs: `int n = 0;
+foreach (int x in a)
+    if (x % 2 == 0) n++;` },
+      { psz: `N := 0
+CIKLUS i := 1-től n-ig
+    HA betu[i] magánhangzó AKKOR N := N + 1
+CIKLUS VÉGE`,
+        py: `n = 0
+for betu in szo:
+    if betu.lower() in 'aeiouáéíóöőúüű':
+        n += 1`,
+        cs: `int n = 0;
+foreach (char betu in szo)
+    if ("aeiouáéíóöőúüű".Contains(char.ToLower(betu))) n++;` },
+      { psz: `N := 0
+CIKLUS i := 1-től n-ig
+    HA h[i] < 0 AKKOR N := N + 1
+CIKLUS VÉGE`,
+        py: `n = 0
+for h in homerseklet:
+    if h < 0:
+        n += 1`,
+        cs: `int n = 0;
+foreach (int h in homerseklet)
+    if (h < 0) n++;` },
+      { psz: `N := 0
+CIKLUS i := 1-től n-ig
+    HA keszlet[i] = 0 AKKOR N := N + 1
+CIKLUS VÉGE`,
+        py: `n = 0
+for k in keszlet:
+    if k == 0:
+        n += 1`,
+        cs: `int n = 0;
+foreach (int k in keszlet)
+    if (k == 0) n++;` },
+      { psz: `N := 0
+CIKLUS i := 1-től n-ig
+    HA (ev[i] MOD 4 = 0 ÉS ev[i] MOD 100 <> 0) VAGY ev[i] MOD 400 = 0 AKKOR N := N + 1
+CIKLUS VÉGE`,
+        py: `n = 0
+for ev in evek:
+    if (ev % 4 == 0 and ev % 100 != 0) or ev % 400 == 0:
+        n += 1`,
+        cs: `int n = 0;
+foreach (int ev in evek)
+    if ((ev % 4 == 0 && ev % 100 != 0) || ev % 400 == 0) n++;` },
+      { psz: `N := 0
+CIKLUS i := 1-től n-ig
+    HA szo[i] = 'kutya' AKKOR N := N + 1
+CIKLUS VÉGE`,
+        py: `n = 0
+for szo in szavak:
+    if szo == 'kutya':
+        n += 1`,
+        cs: `int n = 0;
+foreach (string szo in szavak)
+    if (szo == "kutya") n++;` },
+      { psz: `N := 0
+CIKLUS i := 1-től n-ig
+    HA 10000 <= a[i] ÉS a[i] <= 99999 AKKOR N := N + 1
+CIKLUS VÉGE`,
+        py: `n = 0
+for x in a:
+    if 10000 <= x <= 99999:
+        n += 1`,
+        cs: `int n = 0;
+foreach (int x in a)
+    if (x >= 10000 && x <= 99999) n++;` },
+      { psz: `N := 0
+CIKLUS i := 1-től n-ig
+    HA eredmeny[i] = 'nem teljesített' AKKOR N := N + 1
+CIKLUS VÉGE`,
+        py: `n = 0
+for e in eredmenyek:
+    if e == 'nem teljesített':
+        n += 1`,
+        cs: `int n = 0;
+foreach (string e in eredmenyek)
+    if (e == "nem teljesített") n++;` },
+      { psz: `N := 0
+CIKLUS i := 1-től n-ig
+    HA 10 <= a[i] ÉS a[i] <= 99 AKKOR N := N + 1
+CIKLUS VÉGE`,
+        py: `n = 0
+for x in a:
+    if 10 <= x <= 99:
+        n += 1`,
+        cs: `int n = 0;
+foreach (int x in a)
+    if (x >= 10 && x <= 99) n++;` },
+      { psz: `N := 0
+CIKLUS minden hallgatóra
+    OTOSOK := 0
+    CIKLUS minden tárgyra
+        HA jegy = 5 AKKOR OTOSOK := OTOSOK + 1
+    CIKLUS VÉGE
+    HA OTOSOK >= 3 AKKOR N := N + 1
+CIKLUS VÉGE`,
+        py: `n = 0
+for jegyek in hallgatok:
+    otosok = sum(1 for j in jegyek if j == 5)
+    if otosok >= 3:
+        n += 1`,
+        cs: `int n = 0;
+foreach (var jegyek in hallgatok)
+    if (jegyek.Count(j => j == 5) >= 3) n++;` },
+      { psz: `N := 0
+CIKLUS i := 1-től n-ig
+    HA lista[i] MOD 2 = 0 AKKOR N := N + 1
+CIKLUS VÉGE`,
+        py: `n = 0
+for x in lista:
+    if x % 2 == 0:
+        n += 1`,
+        cs: `int n = 0;
+foreach (int x in lista)
+    if (x % 2 == 0) n++;` },
+      { psz: `N := 0
+CIKLUS i := 1-től n-ig
+    HA feltétel(a[i]) AKKOR N := N + 1
+CIKLUS VÉGE`,
+        py: `n = 0
+for x in a:
+    if feltetel(x):
+        n += 1`,
+        cs: `int n = 0;
+foreach (int x in a)
+    if (feltetel(x)) n++;` },
+      { psz: `N := 0
+CIKLUS i := 1-től n-ig
+    HA a[i] > 10 AKKOR N := N + 1
+CIKLUS VÉGE`,
+        py: `n = 0
+for x in a:
+    if x > 10:
+        n += 1`,
+        cs: `int n = 0;
+foreach (int x in a)
+    if (x > 10) n++;` },
+      { psz: `N := 0
+CIKLUS i := 1-től 60-ig
+    HA dobas[i] = 6 AKKOR N := N + 1
+CIKLUS VÉGE`,
+        py: `n = 0
+for d in dobasok:
+    if d == 6:
+        n += 1`,
+        cs: `int n = 0;
+foreach (int d in dobasok)
+    if (d == 6) n++;` },
+      { psz: `N := 0
+MÍG NEM vége a fájlnak
+    OLVASS BE sort
+    HA sor = üres AKKOR N := N + 1
+CIKLUS VÉGE`,
+        py: `n = 0
+for sor in open('adat.txt'):
+    if sor.strip() == '':
+        n += 1`,
+        cs: `int n = 0;
+foreach (string sor in File.ReadLines("adat.txt"))
+    if (sor.Trim() == "") n++;` },
+      { psz: `N := 0
+CIKLUS i := 1-től 12-ig
+    HA tav[i] > 10 AKKOR N := N + 1
+CIKLUS VÉGE`,
+        py: `n = 0
+for t in tavok:
+    if t > 10:
+        n += 1`,
+        cs: `int n = 0;
+foreach (double t in tavok)
+    if (t > 10) n++;` },
+      { psz: `N := 0
+CIKLUS i := 1-től n-ig
+    HA szoveg[i] = 'a' AKKOR N := N + 1
+CIKLUS VÉGE`,
+        py: `n = 0
+for c in szoveg:
+    if c == 'a':
+        n += 1`,
+        cs: `int n = 0;
+foreach (char c in szoveg)
+    if (c == 'a') n++;` },
+      { psz: `N := 0
+MÍG NEM vége a fájlnak
+    OLVASS BE sort
+    HA hossz(sor) > 80 AKKOR N := N + 1
+CIKLUS VÉGE`,
+        py: `n = 0
+for sor in open('adat.txt'):
+    if len(sor) > 80:
+        n += 1`,
+        cs: `int n = 0;
+foreach (string sor in File.ReadLines("adat.txt"))
+    if (sor.Length > 80) n++;` }
+    ],
+
+    "Maximumkiválasztás": [
+      { psz: `min := a[1]
+CIKLUS i := 2-től n-ig
+    HA a[i] < min AKKOR min := a[i]
+CIKLUS VÉGE`,
+        py: `m = a[0]
+for x in a[1:]:
+    if x < m:
+        m = x`,
+        cs: `int m = a[0];
+for (int i = 1; i < a.Length; i++)
+    if (a[i] < m) m = a[i];` },
+      { psz: `max := h[1]
+CIKLUS i := 2-től n-ig
+    HA h[i] > max AKKOR max := h[i]
+CIKLUS VÉGE`,
+        py: `m = hegyek[0]
+for h in hegyek[1:]:
+    if h > m:
+        m = h`,
+        cs: `int m = hegyek[0];
+for (int i = 1; i < hegyek.Length; i++)
+    if (hegyek[i] > m) m = hegyek[i];` },
+      { psz: `max := p[1]
+CIKLUS i := 2-től n-ig
+    HA p[i] > max AKKOR max := p[i]
+CIKLUS VÉGE`,
+        py: `m = pontok[0]
+for p in pontok[1:]:
+    if p > m:
+        m = p`,
+        cs: `int m = pontok[0];
+for (int i = 1; i < pontok.Length; i++)
+    if (pontok[i] > m) m = pontok[i];` },
+      { psz: `max := ar[1]
+CIKLUS i := 2-től n-ig
+    HA ar[i] > max AKKOR max := ar[i]
+CIKLUS VÉGE`,
+        py: `m = arak[0]
+for a in arak[1:]:
+    if a > m:
+        m = a`,
+        cs: `int m = arak[0];
+for (int i = 1; i < arak.Length; i++)
+    if (arak[i] > m) m = arak[i];` },
+      { psz: `legh := sz[1]
+CIKLUS i := 2-től n-ig
+    HA hossz(sz[i]) > hossz(legh) AKKOR legh := sz[i]
+CIKLUS VÉGE`,
+        py: `legh = szavak[0]
+for sz in szavak[1:]:
+    if len(sz) > len(legh):
+        legh = sz`,
+        cs: `string legh = szavak[0];
+foreach (string sz in szavak)
+    if (sz.Length > legh.Length) legh = sz;` },
+      { psz: `max := h[1]
+CIKLUS i := 2-től 7-ig
+    HA h[i] > max AKKOR max := h[i]
+CIKLUS VÉGE`,
+        py: `m = homerseklet[0]
+for h in homerseklet[1:]:
+    if h > m:
+        m = h`,
+        cs: `int m = homerseklet[0];
+foreach (int h in homerseklet)
+    if (h > m) m = h;` },
+      { psz: `min := eletkor[1]
+CIKLUS i := 2-től n-ig
+    HA eletkor[i] < min AKKOR min := eletkor[i]
+CIKLUS VÉGE`,
+        py: `m = eletkorok[0]
+for e in eletkorok[1:]:
+    if e < m:
+        m = e`,
+        cs: `int m = eletkorok[0];
+foreach (int e in eletkorok)
+    if (e < m) m = e;` },
+      { psz: `max := a[1]
+CIKLUS i := 2-től n-ig
+    HA a[i] > max AKKOR max := a[i]
+CIKLUS VÉGE`,
+        py: `m = a[0]
+for x in a[1:]:
+    if x > m:
+        m = x`,
+        cs: `int m = a[0];
+foreach (int x in a)
+    if (x > m) m = x;` },
+      { psz: `max := koltes[1]
+CIKLUS i := 2-től n-ig
+    HA koltes[i] > max AKKOR max := koltes[i]
+CIKLUS VÉGE`,
+        py: `m = koltesek[0]
+for k in koltesek[1:]:
+    if k > m:
+        m = k`,
+        cs: `int m = koltesek[0];
+foreach (int k in koltesek)
+    if (k > m) m = k;` },
+      { psz: `idx := 1
+CIKLUS i := 2-től n-ig
+    HA a[i] < a[idx] AKKOR idx := i
+CIKLUS VÉGE
+KI: idx`,
+        py: `idx = 0
+for i in range(1, len(a)):
+    if a[i] < a[idx]:
+        idx = i`,
+        cs: `int idx = 0;
+for (int i = 1; i < a.Length; i++)
+    if (a[i] < a[idx]) idx = i;` },
+      { psz: `max := tav[1]
+CIKLUS i := 2-től n-ig
+    HA tav[i] > max AKKOR max := tav[i]
+CIKLUS VÉGE`,
+        py: `m = tavolsagok[0]
+for t in tavolsagok[1:]:
+    if t > m:
+        m = t`,
+        cs: `int m = tavolsagok[0];
+foreach (int t in tavolsagok)
+    if (t > m) m = t;` },
+      { psz: `max := bevetel[1]
+CIKLUS i := 2-től 12-ig
+    HA bevetel[i] > max AKKOR max := bevetel[i]
+CIKLUS VÉGE`,
+        py: `m = bevetel[0]
+for b in bevetel[1:]:
+    if b > m:
+        m = b`,
+        cs: `int m = bevetel[0];
+foreach (int b in bevetel)
+    if (b > m) m = b;` },
+      { psz: `i := 1
+CIKLUS j := 2-től n-ig
+    HA magassag[j] > magassag[i] AKKOR i := j
+CIKLUS VÉGE
+KI: nev[i]`,
+        py: `i = 0
+for j in range(1, len(magassag)):
+    if magassag[j] > magassag[i]:
+        i = j
+print(nev[i])`,
+        cs: `int i = 0;
+for (int j = 1; j < magassag.Length; j++)
+    if (magassag[j] > magassag[i]) i = j;
+Console.WriteLine(nev[i]);` },
+      { psz: `min := ido[1]
+CIKLUS i := 2-től n-ig
+    HA ido[i] < min AKKOR min := ido[i]
+CIKLUS VÉGE`,
+        py: `m = ido[0]
+for t in ido[1:]:
+    if t < m:
+        m = t`,
+        cs: `int m = ido[0];
+foreach (int t in ido)
+    if (t < m) m = t;` },
+      { psz: `max := T[1, oszlop]
+CIKLUS i := 2-től n-ig
+    HA T[i, oszlop] > max AKKOR max := T[i, oszlop]
+CIKLUS VÉGE`,
+        py: `m = tabla[0][oszlop]
+for sor in tabla[1:]:
+    if sor[oszlop] > m:
+        m = sor[oszlop]`,
+        cs: `int m = tabla[0, oszlop];
+for (int i = 1; i < tabla.GetLength(0); i++)
+    if (tabla[i, oszlop] > m) m = tabla[i, oszlop];` },
+      { psz: `min := ar[1]
+CIKLUS i := 2-től n-ig
+    HA ar[i] < min AKKOR min := ar[i]
+CIKLUS VÉGE`,
+        py: `m = arak[0]
+for a in arak[1:]:
+    if a < m:
+        m = a`,
+        cs: `int m = arak[0];
+foreach (int a in arak)
+    if (a < m) m = a;` },
+      { psz: `idx := 1
+CIKLUS i := 2-től n-ig
+    HA a[i] > a[idx] AKKOR idx := i
+CIKLUS VÉGE
+KI: a[idx], idx`,
+        py: `idx = 0
+for i in range(1, len(a)):
+    if a[i] > a[idx]:
+        idx = i
+print(a[idx], idx)`,
+        cs: `int idx = 0;
+for (int i = 1; i < a.Length; i++)
+    if (a[i] > a[idx]) idx = i;
+Console.WriteLine(a[idx]);` },
+      { psz: `max := csap[1]
+CIKLUS i := 2-től n-ig
+    HA csap[i] > max AKKOR max := csap[i]
+CIKLUS VÉGE`,
+        py: `m = csapadek[0]
+for c in csapadek[1:]:
+    if c > m:
+        m = c`,
+        cs: `int m = csapadek[0];
+foreach (int c in csapadek)
+    if (c > m) m = c;` },
+      { psz: `i := 1
+CIKLUS j := 2-től n-ig
+    HA konyv[j] > konyv[i] AKKOR i := j
+CIKLUS VÉGE
+KI: olvaso[i]`,
+        py: `i = 0
+for j in range(1, len(konyvek)):
+    if konyvek[j] > konyvek[i]:
+        i = j
+print(olvasok[i])`,
+        cs: `int i = 0;
+for (int j = 1; j < konyvek.Length; j++)
+    if (konyvek[j] > konyvek[i]) i = j;
+Console.WriteLine(olvasok[i]);` },
+      { psz: `min := h[1]
+CIKLUS i := 2-től n-ig
+    HA h[i] < min AKKOR min := h[i]
+CIKLUS VÉGE
+VISSZAAD min`,
+        py: `m = h[0]
+for x in h[1:]:
+    if x < m:
+        m = x
+return m`,
+        cs: `int m = h[0];
+foreach (int x in h)
+    if (x < m) m = x;
+return m;` }
+    ],
+
+    "Eldöntés": [
+      { psz: `van := HAMIS
+CIKLUS i := 1-től n-ig
+    HA a[i] > 1000 AKKOR van := IGAZ
+CIKLUS VÉGE`,
+        py: `van = any(x > 1000 for x in a)`,
+        cs: `bool van = a.Any(x => x > 1000);   // using System.Linq;` },
+      { psz: `igaz := IGAZ
+CIKLUS i := 1-től n-ig
+    HA a[i] <= 0 AKKOR igaz := HAMIS
+CIKLUS VÉGE`,
+        py: `igaz = all(x > 0 for x in a)`,
+        cs: `bool igaz = a.All(x => x > 0);` },
+      { psz: `van := HAMIS
+CIKLUS i := 1-től n-ig
+    HA jelszo[i] nagybetű AKKOR van := IGAZ
+CIKLUS VÉGE`,
+        py: `van = any(c.isupper() for c in jelszo)`,
+        cs: `bool van = jelszo.Any(char.IsUpper);` },
+      { psz: `van := HAMIS
+CIKLUS i := 1-től n-ig
+    HA ar[i] = 0 AKKOR van := IGAZ
+CIKLUS VÉGE`,
+        py: `van = 0 in arak`,
+        cs: `bool van = arak.Contains(0);` },
+      { psz: `van := HAMIS
+CIKLUS i := 1-től n-ig
+    CIKLUS j := i+1-től n-ig
+        HA a[i] = a[j] AKKOR van := IGAZ
+    CIKLUS VÉGE
+CIKLUS VÉGE`,
+        py: `van = len(set(a)) < len(a)`,
+        cs: `bool van = a.Distinct().Count() < a.Length;` },
+      { psz: `van := HAMIS
+CIKLUS i := 1-től n-ig
+    HA nevek[i] = 'Budapest' AKKOR van := IGAZ
+CIKLUS VÉGE`,
+        py: `van = 'Budapest' in nevek`,
+        cs: `bool van = nevek.Contains("Budapest");` },
+      { psz: `van := HAMIS
+CIKLUS i := 1-től n-ig
+    HA négyzetszám(a[i]) AKKOR van := IGAZ
+CIKLUS VÉGE`,
+        py: `van = any(int(x ** 0.5) ** 2 == x for x in a)`,
+        cs: `bool van = a.Any(x => (int)Math.Sqrt(x) * (int)Math.Sqrt(x) == x);` },
+      { psz: `van := HAMIS
+CIKLUS i := 1-től n-ig
+    HA keses[i] > 0 AKKOR van := IGAZ
+CIKLUS VÉGE`,
+        py: `van = any(k > 0 for k in keses)`,
+        cs: `bool van = keses.Any(k => k > 0);` },
+      { psz: `van := HAMIS
+CIKLUS i := 1-től 7-ig
+    HA ho[i] > 30 AKKOR van := IGAZ
+CIKLUS VÉGE`,
+        py: `van = any(h > 30 for h in homerseklet)`,
+        cs: `bool van = homerseklet.Any(h => h > 30);` },
+      { psz: `van := HAMIS
+CIKLUS i := 1-től n-ig
+    HA szo[i] = 'x' AKKOR van := IGAZ
+CIKLUS VÉGE`,
+        py: `van = 'x' in szo`,
+        cs: `bool van = szo.Contains('x');` },
+      { psz: `igaz := IGAZ
+CIKLUS i := 1-től n-ig
+    HA a[i] MOD 2 <> 0 AKKOR igaz := HAMIS
+CIKLUS VÉGE`,
+        py: `igaz = all(x % 2 == 0 for x in a)`,
+        cs: `bool igaz = a.All(x => x % 2 == 0);` },
+      { psz: `van := HAMIS
+CIKLUS i := 1-től n-ig
+    HA jegy[i] = 1 AKKOR van := IGAZ
+CIKLUS VÉGE`,
+        py: `van = any(j == 1 for j in jegyek)`,
+        cs: `bool van = jegyek.Any(j => j == 1);` },
+      { psz: `igaz := IGAZ
+CIKLUS i := 1-től n-1-ig
+    HA a[i] > a[i+1] AKKOR igaz := HAMIS
+CIKLUS VÉGE`,
+        py: `igaz = all(a[i] <= a[i + 1] for i in range(len(a) - 1))`,
+        cs: `bool igaz = true;
+for (int i = 0; i < a.Length - 1; i++)
+    if (a[i] > a[i + 1]) igaz = false;` },
+      { psz: `van := HAMIS
+CIKLUS i := 1-től n-ig
+    HA mezo[i] = üres AKKOR van := IGAZ
+CIKLUS VÉGE`,
+        py: `van = any(m == '' for m in mezok)`,
+        cs: `bool van = mezok.Any(m => string.IsNullOrEmpty(m));` },
+      { psz: `igaz := IGAZ
+CIKLUS i := 1-től n-ig
+    HA kor[i] <= 18 AKKOR igaz := HAMIS
+CIKLUS VÉGE`,
+        py: `igaz = all(k > 18 for k in korok)`,
+        cs: `bool igaz = korok.All(k => k > 18);` },
+      { psz: `van := HAMIS
+CIKLUS i := 1-től n-ig
+    HA a[i] = 0 AKKOR van := IGAZ
+CIKLUS VÉGE`,
+        py: `van = 0 in a`,
+        cs: `bool van = a.Contains(0);` },
+      { psz: `egyenlo := IGAZ
+HA hossz(L1) <> hossz(L2) AKKOR egyenlo := HAMIS
+CIKLUS i := 1-től n-ig
+    HA L1[i] <> L2[i] AKKOR egyenlo := HAMIS
+CIKLUS VÉGE`,
+        py: `egyenlo = L1 == L2`,
+        cs: `bool egyenlo = L1.SequenceEqual(L2);` },
+      { psz: `van := HAMIS
+CIKLUS i := 1-től n-ig
+    HA email[i] = '@' AKKOR van := IGAZ
+CIKLUS VÉGE`,
+        py: `van = '@' in email`,
+        cs: `bool van = email.Contains('@');` },
+      { psz: `van := HAMIS
+CIKLUS i := 1-től n-ig
+    HA a[i] MOD 7 = 0 AKKOR van := IGAZ
+CIKLUS VÉGE`,
+        py: `van = any(x % 7 == 0 for x in a)`,
+        cs: `bool van = a.Any(x => x % 7 == 0);` },
+      { psz: `van := HAMIS
+CIKLUS i := 1-től n-ig
+    HA a[i] MOD 2 = 1 AKKOR van := IGAZ
+CIKLUS VÉGE`,
+        py: `van = any(x % 2 == 1 for x in a)`,
+        cs: `bool van = a.Any(x => x % 2 == 1);` }
+    ],
+
+    "Kiválogatás": [
+      { psz: `db := 0
+CIKLUS i := 1-től n-ig
+    HA kor[i] < 18 AKKOR
+        db := db + 1
+        lista[db] := nev[i]
+CIKLUS VÉGE`,
+        py: `lista = [nev for nev, kor in zip(nevek, korok) if kor < 18]`,
+        cs: `var lista = new List<string>();
+for (int i = 0; i < nevek.Length; i++)
+    if (korok[i] < 18) lista.Add(nevek[i]);` },
+      { psz: `db := 0
+CIKLUS i := 1-től n-ig
+    HA a[i] MOD 3 = 0 AKKOR
+        db := db + 1
+        b[db] := a[i]
+CIKLUS VÉGE`,
+        py: `b = [x for x in a if x % 3 == 0]`,
+        cs: `var b = new List<int>();
+foreach (int x in a)
+    if (x % 3 == 0) b.Add(x);` },
+      { psz: `db := 0
+CIKLUS i := 1-től n-ig
+    HA varos[i] 'A'-val kezdődik AKKOR
+        db := db + 1
+        b[db] := varos[i]
+CIKLUS VÉGE`,
+        py: `b = [v for v in varosok if v.startswith('A')]`,
+        cs: `var b = new List<string>();
+foreach (string v in varosok)
+    if (v.StartsWith("A")) b.Add(v);` },
+      { psz: `db := 0
+CIKLUS i := 1-től n-ig
+    HA ar[i] > 2000 AKKOR
+        db := db + 1
+        uj[db] := tetel[i]
+CIKLUS VÉGE`,
+        py: `uj = [t for t, a in zip(tetelek, arak) if a > 2000]`,
+        cs: `var uj = new List<string>();
+for (int i = 0; i < tetelek.Length; i++)
+    if (arak[i] > 2000) uj.Add(tetelek[i]);` },
+      { psz: `db := 0
+CIKLUS i := 1-től n-ig
+    HA eredmeny[i] = 'megfelelt' AKKOR
+        db := db + 1
+        lista[db] := diak[i]
+CIKLUS VÉGE`,
+        py: `lista = [d for d, e in zip(diakok, eredmenyek) if e == 'megfelelt']`,
+        cs: `var lista = new List<string>();
+for (int i = 0; i < diakok.Length; i++)
+    if (eredmenyek[i] == "megfelelt") lista.Add(diakok[i]);` },
+      { psz: `db := 0
+CIKLUS i := 1-től n-ig
+    HA palyazat[i] hiányos AKKOR
+        db := db + 1
+        hianyos[db] := palyazat[i]
+CIKLUS VÉGE`,
+        py: `hianyos = [p for p in palyazatok if p.hianyos]`,
+        cs: `var hianyos = palyazatok.Where(p => p.Hianyos).ToList();` },
+      { psz: `db := 0
+CIKLUS i := 2-től 12-ig
+    HA elad[i] > elad[i-1] AKKOR
+        db := db + 1
+        honapok[db] := honap[i]
+CIKLUS VÉGE`,
+        py: `honapok = [honap[i] for i in range(1, 12) if eladas[i] > eladas[i - 1]]`,
+        cs: `var honapok = new List<string>();
+for (int i = 1; i < 12; i++)
+    if (eladas[i] > eladas[i - 1]) honapok.Add(honap[i]);` },
+      { psz: `db := 0
+CIKLUS i := 1-től n-ig
+    HA keszlet[i] > 0 AKKOR
+        db := db + 1
+        lista[db] := termek[i]
+CIKLUS VÉGE`,
+        py: `lista = [t for t, k in zip(termekek, keszlet) if k > 0]`,
+        cs: `var lista = new List<string>();
+for (int i = 0; i < termekek.Length; i++)
+    if (keszlet[i] > 0) lista.Add(termekek[i]);` },
+      { psz: `db := 0
+CIKLUS i := 1-től n-ig
+    HA h[i] < 0 AKKOR
+        db := db + 1
+        neg[db] := h[i]
+CIKLUS VÉGE`,
+        py: `neg = [h for h in homerseklet if h < 0]`,
+        cs: `var neg = new List<int>();
+foreach (int h in homerseklet)
+    if (h < 0) neg.Add(h);` },
+      { psz: `db := 0
+CIKLUS i := 1-től n-ig
+    HA tav[i] > 10 AKKOR
+        db := db + 1
+        lista[db] := versenyzo[i]
+CIKLUS VÉGE`,
+        py: `lista = [v for v, t in zip(versenyzok, tavok) if t > 10]`,
+        cs: `var lista = new List<string>();
+for (int i = 0; i < versenyzok.Length; i++)
+    if (tavok[i] > 10) lista.Add(versenyzok[i]);` },
+      { psz: `db := 0
+CIKLUS i := 1-től n-ig
+    HA szoveg[i] magánhangzó AKKOR
+        db := db + 1
+        magan[db] := szoveg[i]
+CIKLUS VÉGE`,
+        py: `magan = [c for c in szoveg if c.lower() in 'aeiouáéíóöőúüű']`,
+        cs: `var magan = new List<char>();
+foreach (char c in szoveg)
+    if ("aeiouáéíóöőúüű".Contains(char.ToLower(c))) magan.Add(c);` },
+      { psz: `db := 0
+CIKLUS i := 1-től n-ig
+    HA a[i] < 100 AKKOR
+        db := db + 1
+        uj[db] := a[i]
+CIKLUS VÉGE`,
+        py: `uj = [x for x in a if x < 100]`,
+        cs: `var uj = new List<int>();
+foreach (int x in a)
+    if (x < 100) uj.Add(x);` },
+      { psz: `db := 0
+CIKLUS i := 1-től n-ig
+    HA lejarat[i] < mai_datum AKKOR
+        db := db + 1
+        lista[db] := termek[i]
+CIKLUS VÉGE`,
+        py: `lista = [t for t, d in zip(termekek, lejaratok) if d < mai_datum]`,
+        cs: `var lista = new List<string>();
+for (int i = 0; i < termekek.Length; i++)
+    if (lejaratok[i] < maiDatum) lista.Add(termekek[i]);` },
+      { psz: `db := 0
+CIKLUS i := 1-től n-ig
+    HA kolcsonzes[i] hátralékos AKKOR
+        db := db + 1
+        lista[db] := kolcsonzes[i]
+CIKLUS VÉGE`,
+        py: `lista = [k for k in kolcsonzesek if k.hatralekos]`,
+        cs: `var lista = kolcsonzesek.Where(k => k.Hatralekos).ToList();` },
+      { psz: `db := 0
+CIKLUS i := 1-től n-ig
+    HA hossz(szo[i]) > 5 AKKOR
+        db := db + 1
+        lista[db] := szo[i]
+CIKLUS VÉGE`,
+        py: `lista = [s for s in szavak if len(s) > 5]`,
+        cs: `var lista = szavak.Where(s => s.Length > 5).ToList();` },
+      { psz: `db := 0
+CIKLUS i := 1-től n-ig
+    HA kedvezmeny[i] = IGAZ AKKOR
+        db := db + 1
+        lista[db] := tetel[i]
+CIKLUS VÉGE`,
+        py: `lista = [t for t in tetelek if t.kedvezmenyes]`,
+        cs: `var lista = tetelek.Where(t => t.Kedvezmenyes).ToList();` },
+      { psz: `db := 0
+CIKLUS i := 1-től n-ig
+    HA evjarat[i] > 1990 AKKOR
+        db := db + 1
+        lista[db] := auto[i]
+CIKLUS VÉGE`,
+        py: `lista = [a for a, ev in zip(autok, evjaratok) if ev > 1990]`,
+        cs: `var lista = new List<string>();
+for (int i = 0; i < autok.Length; i++)
+    if (evjaratok[i] > 1990) lista.Add(autok[i]);` },
+      { psz: `db := 0
+CIKLUS i := 1-től n-ig
+    HA szo[i] nagybetűvel kezdődik AKKOR
+        db := db + 1
+        lista[db] := szo[i]
+CIKLUS VÉGE`,
+        py: `lista = [s for s in szavak if s[0].isupper()]`,
+        cs: `var lista = szavak.Where(s => char.IsUpper(s[0])).ToList();` },
+      { psz: `db := 0
+CIKLUS i := 1-től n-ig
+    HA meres[i] hibás AKKOR
+        db := db + 1
+        uj[db] := meres[i]
+CIKLUS VÉGE`,
+        py: `uj = [m for m in meresek if m.hibas]`,
+        cs: `var uj = meresek.Where(m => m.Hibas).ToList();` },
+      { psz: `db := 0
+CIKLUS i := 1-től n-ig
+    HA adat[i] < 0 AKKOR
+        db := db + 1
+        uj[db] := adat[i]
+CIKLUS VÉGE`,
+        py: `uj = [x for x in adat if x < 0]`,
+        cs: `var uj = adat.Where(x => x < 0).ToList();` }
+    ],
+
+    "Keresés": [
+      { psz: `i := 1
+MÍG versenyzo[i].varos <> 'Budapest'
+    i := i + 1
+CIKLUS VÉGE   // biztosan van ilyen versenyző`,
+        py: `i = 0
+while versenyzok[i].varos != 'Budapest':
+    i += 1`,
+        cs: `int i = 0;
+while (versenyzok[i].Varos != "Budapest") i++;` },
+      { psz: `i := 1
+MÍG a[i] <= 100
+    i := i + 1
+CIKLUS VÉGE   // biztosan van 100-nál nagyobb szám`,
+        py: `i = 0
+while a[i] <= 100:
+    i += 1`,
+        cs: `int i = 0;
+while (a[i] <= 100) i++;` },
+      { psz: `i := 1
+MÍG a[i] <> 42
+    i := i + 1
+CIKLUS VÉGE`,
+        py: `i = a.index(42)`,
+        cs: `int i = Array.IndexOf(a, 42);` },
+      { psz: `i := 1
+MÍG vevo[i].vezeteknev <> 'Fehér'
+    i := i + 1
+CIKLUS VÉGE`,
+        py: `i = 0
+while vevok[i].vezeteknev != 'Fehér':
+    i += 1`,
+        cs: `int i = 0;
+while (vevok[i].Vezeteknev != "Fehér") i++;` },
+      { psz: `i := 1
+MÍG a[i] >= 0
+    i := i + 1
+CIKLUS VÉGE   // biztosan van negatív elem`,
+        py: `i = 0
+while a[i] >= 0:
+    i += 1`,
+        cs: `int i = 0;
+while (a[i] >= 0) i++;` },
+      { psz: `i := 1
+MÍG konyv[i].cim <> 'Háború és béke'
+    i := i + 1
+CIKLUS VÉGE`,
+        py: `i = 0
+while konyvek[i].cim != 'Háború és béke':
+    i += 1`,
+        cs: `int i = 0;
+while (konyvek[i].Cim != "Háború és béke") i++;` },
+      { psz: `i := 1
+MÍG nev[i] <> 'Szabó Péter'
+    i := i + 1
+CIKLUS VÉGE
+KI: telefon[i]`,
+        py: `i = 0
+while nevek[i] != 'Szabó Péter':
+    i += 1
+print(telefonok[i])`,
+        cs: `int i = 0;
+while (nevek[i] != "Szabó Péter") i++;
+Console.WriteLine(telefonok[i]);` },
+      { psz: `i := 1
+MÍG a[i] >= x
+    i := i + 1
+CIKLUS VÉGE   // biztosan van x-nél kisebb elem`,
+        py: `i = 0
+while a[i] >= x:
+    i += 1`,
+        cs: `int i = 0;
+while (a[i] >= x) i++;` },
+      { psz: `i := 1
+MÍG szo[i] <> 'a'
+    i := i + 1
+CIKLUS VÉGE`,
+        py: `i = szo.index('a')`,
+        cs: `int i = szo.IndexOf('a');` },
+      { psz: `i := 1
+MÍG tabla[i].nev <> 'Kiss Anna'
+    i := i + 1
+CIKLUS VÉGE`,
+        py: `i = 0
+while tabla[i].nev != 'Kiss Anna':
+    i += 1`,
+        cs: `int i = 0;
+while (tabla[i].Nev != "Kiss Anna") i++;` },
+      { psz: `i := 1
+MÍG rekord[i].azonosito <> 1042
+    i := i + 1
+CIKLUS VÉGE`,
+        py: `i = 0
+while rekordok[i].azonosito != 1042:
+    i += 1`,
+        cs: `int i = 0;
+while (rekordok[i].Azonosito != 1042) i++;` },
+      { psz: `i := 1
+MÍG versenyzo[i].rajtszam <> rajtszam
+    i := i + 1
+CIKLUS VÉGE`,
+        py: `i = 0
+while versenyzok[i].rajtszam != rajtszam:
+    i += 1`,
+        cs: `int i = 0;
+while (versenyzok[i].Rajtszam != rajtszam) i++;` },
+      { psz: `i := 1
+MÍG NEM a[i].hibas
+    i := i + 1
+CIKLUS VÉGE   // biztosan van hibás elem`,
+        py: `i = 0
+while not a[i].hibas:
+    i += 1`,
+        cs: `int i = 0;
+while (!a[i].Hibas) i++;` },
+      { psz: `i := 1
+MÍG szinek[i] <> 'Piros'
+    i := i + 1
+CIKLUS VÉGE`,
+        py: `i = 0
+while szinek[i] != 'Piros':
+    i += 1`,
+        cs: `int i = 0;
+while (szinek[i] != "Piros") i++;` },
+      { psz: `i := 1
+MÍG lakhely[i] <> 'Debrecen'
+    i := i + 1
+CIKLUS VÉGE   // biztosan van Debrecenben lakó személy`,
+        py: `i = 0
+while lakhelyek[i] != 'Debrecen':
+    i += 1`,
+        cs: `int i = 0;
+while (lakhelyek[i] != "Debrecen") i++;` },
+      { psz: `i := 1
+MÍG dal[i].hossz <= 5
+    i := i + 1
+CIKLUS VÉGE   // biztosan van 5 percnél hosszabb dal`,
+        py: `i = 0
+while dalok[i].hossz <= 5:
+    i += 1`,
+        cs: `int i = 0;
+while (dalok[i].Hossz <= 5) i++;` },
+      { psz: `i := 1
+MÍG dolgozat[i] <= 90
+    i := i + 1
+CIKLUS VÉGE   // biztosan van 90 pont feletti dolgozat`,
+        py: `i = 0
+while dolgozatok[i] <= 90:
+    i += 1`,
+        cs: `int i = 0;
+while (dolgozatok[i] <= 90) i++;` },
+      { psz: `i := 1
+MÍG jarmu[i].azonosito <> 'K-1234'
+    i := i + 1
+CIKLUS VÉGE`,
+        py: `i = 0
+while jarmuvek[i].azonosito != 'K-1234':
+    i += 1`,
+        cs: `int i = 0;
+while (jarmuvek[i].Azonosito != "K-1234") i++;` },
+      { psz: `i := 1
+MÍG szoveg[i] <> '@'
+    i := i + 1
+CIKLUS VÉGE`,
+        py: `i = szoveg.index('@')`,
+        cs: `int i = szoveg.IndexOf('@');` },
+      { psz: `i := 1
+MÍG polc[i] <> keresett_konyv
+    i := i + 1
+CIKLUS VÉGE`,
+        py: `i = 0
+while polc[i] != keresett_konyv:
+    i += 1`,
+        cs: `int i = 0;
+while (polc[i] != keresettKonyv) i++;` }
+    ]
+  };
+
+  function buildCode(cat, qi) {
+    const c = CODEQ[cat][qi];
     const wrap = el('div', { class: 'code-box' });
     const tabs = el('div', { class: 'code-tabs' });
     const pres = {};
@@ -694,7 +1861,7 @@ while (a[i] != keresett) i++;
     mode = m;
     const cards = [];
     (m === 'Vegyes' ? CATS : [m]).forEach(c =>
-      DATA[c].forEach(item => cards.push({ cat: c, item }))
+      DATA[c].forEach((item, i) => { item.qi = i; cards.push({ cat: c, item }); })
     );
     deck = (m === 'Vegyes') ? shuffle(cards) : cards;
     idx = 0;
@@ -768,7 +1935,7 @@ while (a[i] != keresett) i++;
     const ex = $('explanation');
     ex.innerHTML = '';
     ex.append(el('p', {}, el('strong', {}, 'Magyarázat: '), item.m));
-    ex.append(buildCode(cat));
+    ex.append(buildCode(cat, item.qi));
     ex.hidden = false;
 
     runInfo.textContent = `Pontszám: ${runOk} / ${runTotal}  ·  ${idx + 1}. kérdés a ${deck.length}-ből`;
